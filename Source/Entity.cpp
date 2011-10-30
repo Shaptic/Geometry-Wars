@@ -187,6 +187,28 @@ void BaseObject::Move_Rate(const float dx, const float dy)
     this->Move(this->GetX() + dx, this->GetY() + dy, this->timer->GetTicks());
 }
 
+
+void BaseObject::Move_Force(const int x, const int y)
+{
+    /* Move the entity to a certain location
+     * in the game world.
+     */
+    this->Move_Force(x * 1.0f, y * 1.0f);
+}
+
+void BaseObject::Move_Force(const float x, const float y)
+{
+    /* Force the entity to a certain location
+     * in the game world.
+     */
+    this->x = x;
+    this->y = y;
+
+    this->collision_box.x = (int)x;
+    this->collision_box.y = (int)y;
+}
+
+
 void BaseObject::Blit()
 {
     /* Update the entity on the screen. */

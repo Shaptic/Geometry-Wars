@@ -42,6 +42,12 @@ public:
     void Move_Rate(const int dx, const int dy);
     void Move_Rate(const float dx, const float dy);
 
+    /* Move an object regardless of frame-rate and 
+     * movement boundaries. 
+     */
+    void Move_Force(const int x, const int y);
+    void Move_Force(const float x, const float y);
+
     /* Update the object on to the display */
     void Blit();
 

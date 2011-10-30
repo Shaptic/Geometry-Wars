@@ -14,6 +14,8 @@ public:
 
     void Update();
 
+    bool isSpecial;     // Gives a bonus
+
 private:
     CPlayer* Player;
 };
