@@ -12,10 +12,6 @@ Controls:
     and click to fire. Press ~ to enable debug mode, and Q to
     spawn enemies.
     
-Bugs:
-    - When moving the window, the player goes offscreen and cannot
-      come back. The enemies follow him.
-      
 Changelog:
     Version 0.1 (10.22.11)
         - Initial release
@@ -24,4 +20,15 @@ Changelog:
         
     Version 0.1.1 (10.23.11)
         - Added bullet spread and timing control
+        
+    Version 0.2 (10.29.11)
+        - Added levels, powerups
+        - Improved controls
+        - Fixed the bug where the player would go offscreen
+          when the window was moved
+          
+    Version 0.2.1 (10.31.11)
+        - Added a particle engine, enemies now explode when hit
+        - Improved levels, game starts out easier, gets harder, etc
+        - Added a shot delay
     
