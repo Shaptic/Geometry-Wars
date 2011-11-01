@@ -17,6 +17,7 @@
 #include "Enemy.h"
 #include "Level.h"
 #include "Timer.h"
+#include "ParticleEngine.h"
 
 static const int PLAYER_SPEED   = 5;
 static const double SHOT_ANGLE  = 10.0;
@@ -55,6 +56,7 @@ private:
     AllEnemies      Enemies;
     AllBullets      Shots;
     LevelManager*   Levels;
+    ParticleEngine* Particles;
     Timer*          Fps;
 
     EnemyIterator   enemy_iters;

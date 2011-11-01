@@ -7,12 +7,13 @@ Engine::Engine()
     if(TTF_Init() != 0)
         handleError(TTF_GetError());
 
-    this->main_font     = TTF_OpenFont("C:\\Windows\\Fonts\\Arial.ttf", 18);
+    this->main_font     = TTF_OpenFont("C:\\Windows\\Fonts\\Arial.ttf", 24);
 
     this->Screen        = new Display(800, 600);
     this->MainMenu      = new Menu(this->Screen);
     this->Levels        = new LevelManager();
     this->Fps           = new Timer();
+    this->Particles     = new ParticleEngine(this->Screen, this->Fps);
 
     /* Set up the player image and limitations. */
     this->Player        = new CPlayer(this->Screen, this->Fps);
@@ -176,6 +177,7 @@ void Engine::CheckCollisions(std::vector<AllEnemies::iterator>& enemy_iters,
         {
             if((*i)->DetectCollision((*j)))
             {
+                this->Particles->ExplodeObject((*i)->GetX(), (*i)->GetY());
                 this->score += 5;
                 enemy_iters.push_back(i);
                 shot_iters.push_back(j);
@@ -276,6 +278,7 @@ void Engine::UpdateAll()
      */
     this->Screen->ClearScreen();
     this->Player->Blit();
+    this->Particles->UpdateParticles();
     this->ShowDebugInfo();
 
     static std::stringstream ss;
