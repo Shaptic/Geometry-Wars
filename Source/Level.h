@@ -36,6 +36,7 @@ private:
     void LoadNextLevel();
 
     unsigned int enemies_remaining;
+    unsigned int spawned;
 
     Level* Levels;
     Level* CurrentLevel;

@@ -7,9 +7,9 @@ Bit::Bit(Display* Screen, Timer* timer, const int x, const int y, const int m_dx
     this->dy = m_dy;
 
     /* The time this particle will last (ms)*/
-    this->lifetime = 1 + rand() % 50;
+    this->lifetime = 25 + rand() % 25;
 
-    this->SetEntity(create_surface(2, 2, create_color(YELLOW)));
+    this->SetEntity(create_surface(5, 5, create_color(YELLOW)));
 }
 
 Bit::~Bit()
@@ -45,10 +45,10 @@ ParticleEngine::~ParticleEngine()
 
 void ParticleEngine::ExplodeObject(const int x, const int y)
 {
-    /* We will spawn anywhere from 10-20 "bits" that
+    /* We will spawn anywhere from 10-30 "bits" that
      * are left-over from the destroyed enemy.
      */
-    const int bits = 10 + (rand() % 10);
+    const int bits = 10 + (rand() % 20);
     int dx, dy;
 
     for(short i = 0; i < bits; i++)

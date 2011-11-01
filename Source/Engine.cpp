@@ -161,7 +161,7 @@ void Engine::Shoot()
             (int)this->Player->GetY() + this->Player->GetCollisionBoundaries()->h / 2,
             angle_iter);
 
-        shot->SetEntity(create_surface(5, 5, create_color(BLUE)));
+        shot->SetEntity(create_surface(10, 10, create_color(BLUE)));
         this->Shots.push_back(shot);
     }
 }

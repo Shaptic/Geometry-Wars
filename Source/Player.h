@@ -4,9 +4,9 @@
 #include "Entity.h"
 
 /* Between shots, in frames, not seconds */
-static const int SHOT_DELAY = 1;
+static const int SHOT_DELAY = 5;
 
-class CPlayer : public BaseObject
+class CPlayer: public BaseObject
 {
 public:
     CPlayer(Display* Screen, Timer* timer);

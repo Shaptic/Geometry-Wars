@@ -64,6 +64,7 @@ LevelManager::LevelManager()
 
     this->CurrentLevel = this->Levels;
     this->enemies_remaining = this->CurrentLevel->enemy_count;
+    this->spawned = 0;
 }
 
 LevelManager::LevelManager(const std::string& filename)
@@ -131,7 +132,19 @@ LevelManager::LevelManager(const std::string& filename)
 
 bool LevelManager::CanSpawn(const int frame)
 {
-    return (frame % (int)this->CurrentLevel->spawn_delay == 0);
+    if(this->spawned >= this->CurrentLevel->enemy_count)
+    {
+        return false;
+    }
+    else if(frame % (int)this->CurrentLevel->spawn_delay == 0)
+    {
+        this->spawned++;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void LevelManager::UpdateCurrentLevel(const int enemy_count)
@@ -150,6 +163,7 @@ void LevelManager::LoadNextLevel()
     if(this->CurrentLevel == NULL)
         this->CurrentLevel = this->Levels;
 
+    this->spawned           = 0;
     this->enemies_remaining = this->CurrentLevel->enemy_count;
 }
 
