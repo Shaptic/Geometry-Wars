@@ -10,7 +10,7 @@ Dependencies:
 Controls:
     WASD or Arrow Keys to move your ship. Aim with your mouse
     and click to fire. Press ~ to enable debug mode, and Q to
-    spawn enemies.
+    spawn enemies while in debug mode.
     
 Changelog:
     Version 0.1 (10.22.11)
@@ -31,4 +31,10 @@ Changelog:
         - Added a particle engine, enemies now explode when hit
         - Improved levels, game starts out easier, gets harder, etc
         - Added a shot delay
+        
+    Version 0.2.2 (11.5.11)
+        - In debug mode, touching an enemy kills it
+        - More stable levels
+        - Player controls shooting rather than engine
+        
     

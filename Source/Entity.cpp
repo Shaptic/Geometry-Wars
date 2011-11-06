@@ -85,7 +85,7 @@ void BaseObject::LoadEntity(const char* filename)
      * function found in Display.h.
      */
     this->main_entity = LoadImage_Alpha(filename);
-    
+
     if(this->main_entity == NULL)
         handleError(SDL_GetError());
 

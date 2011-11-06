@@ -29,7 +29,7 @@ Bullet::Bullet(Display* Screen, Timer* timer, int x, int y, double angle): BaseO
     this->unit_vector   = sqrt(1.0f * ((dest_x - x)*(dest_x - x) + (dest_y - y)*(dest_y - y)));
     this->dx            = BULLET_SPEED * (dest_x - x) / this->unit_vector;
     this->dy            = BULLET_SPEED * (dest_y - y) / this->unit_vector;
-    
+
     /* Modify vector to go off by x degrees, using matrix multiplication.
      * [x'] = [cos(angle)     -sin(angle)] [x]
      * [y']   [sin(angle)     cos(angle) ] [y]

@@ -88,7 +88,9 @@
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Menus.h" />
+    <ClInclude Include="ParticleEngine.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PowerUps.h" />
     <ClInclude Include="SDL_Helper.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
@@ -104,6 +106,7 @@
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Menus.cpp" />
+    <ClCompile Include="ParticleEngine.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SDL_Helper.cpp" />
     <ClCompile Include="Timer.cpp" />

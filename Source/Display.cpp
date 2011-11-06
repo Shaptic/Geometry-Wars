@@ -96,7 +96,7 @@ Display::Display()
     this->height    = DEFAULT_SCREEN_HEIGHT;
     this->bpp       = DEFAULT_SCREEN_BPP;
     this->flags     = DEFAULT_SCREEN_FLAGS;
-    
+
     /* Initialize the library, set up the display,
      * background layer, etc.
      */
@@ -194,7 +194,7 @@ void Display::RenewDisplay()
     this->height    = DEFAULT_SCREEN_HEIGHT;
     this->bpp       = DEFAULT_SCREEN_BPP;
     this->flags     = DEFAULT_SCREEN_FLAGS;
-    
+
     this->screen = SDL_SetVideoMode(DEFAULT_SCREEN_WIDTH,
             DEFAULT_SCREEN_HEIGHT, DEFAULT_SCREEN_BPP,
             DEFAULT_SCREEN_FLAGS);
@@ -208,7 +208,7 @@ void Display::RenewDisplay(const int width, const int height)
     /* Simply RenewDisplay() with custom parameters. */
     this->width     = width;
     this->height    = height;
-    
+
     this->screen = SDL_SetVideoMode(width, height,
             DEFAULT_SCREEN_BPP, DEFAULT_SCREEN_FLAGS);
 

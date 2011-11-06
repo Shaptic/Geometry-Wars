@@ -20,8 +20,6 @@
 #include "ParticleEngine.h"
 
 static const int PLAYER_SPEED   = 5;
-static const double SHOT_ANGLE  = 10.0;
-static int SHOT_COUNT           = 1;
 
 typedef std::list<Enemy*>                   AllEnemies;
 typedef std::list<Bullet*>                  AllBullets;
@@ -35,17 +33,15 @@ public:
     ~Engine();
 
     void Play();
-
 private:
     void Events();
 
     void AddEnemy();
-    void Shoot();
-    
-    void CheckCollisions(std::vector<AllEnemies::iterator>& enemy_iters,
-            std::vector<AllBullets::iterator>& shot_iters);
-    void RemoveEnemies(std::vector<AllEnemies::iterator>& iters);
-    void RemoveShots(std::vector<AllBullets::iterator>& iters);
+
+    void CheckCollisions();
+    void DestroyEnemy(AllEnemies::iterator i);
+    void RemoveEnemies();
+    void RemoveShots();
 
     void ShowDebugInfo();
     void UpdateAll();

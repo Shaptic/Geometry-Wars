@@ -51,7 +51,7 @@ void Engine::Play()
 {
     if(this->MainMenu->Run() == QUIT_ID)
         return;
-    
+
     SDL_Delay(100);
 
     /* Some local game values, for handling 
@@ -96,8 +96,10 @@ void Engine::Play()
         else
             dx = 0;
 
-        if(IsPressed(SDL_BUTTON_LEFT) && this->Player->CanShoot())
-            this->Shoot();
+        if(IsPressed(SDL_BUTTON_LEFT))
+            this->Player->Shoot(this->Shots);
+
+        this->Particles->AddPlayerTrail(this->Player, dx, dy);
 
         /* Move player accordingly */
         this->Player->Move_Rate(dx, dy);
@@ -105,9 +107,9 @@ void Engine::Play()
         /* Check collisions of bullets with enemies,
          * enemies with player, etc.
          */
-        this->CheckCollisions(this->enemy_iters, this->shot_iters);
-        this->RemoveEnemies(this->enemy_iters);
-        this->RemoveShots(this->shot_iters);
+        this->CheckCollisions();
+        this->RemoveEnemies();
+        this->RemoveShots();
         this->enemy_iters.clear();
         this->shot_iters.clear();
 
@@ -139,35 +141,7 @@ void Engine::Events()
         this->AddEnemy();
 }
 
-void Engine::Shoot()
-{
-    /* We need to calculate the slope that the bullet needs
-     * to have in order to be going in the direction of the 
-     * mouse pointer.
-     */
-    
-    double angle_iter       = SHOT_ANGLE;
-    
-    for(short i = 0; i <= SHOT_COUNT - 1; i++)
-    {
-        if(i % 2 == 0)
-            angle_iter = -(i/2) * SHOT_ANGLE;
-        else
-            angle_iter = (i/2) * SHOT_ANGLE;
-
-        Bullet* shot = new Bullet(
-            this->Screen, this->Fps,
-            (int)this->Player->GetX() + this->Player->GetCollisionBoundaries()->w / 2,
-            (int)this->Player->GetY() + this->Player->GetCollisionBoundaries()->h / 2,
-            angle_iter);
-
-        shot->SetEntity(create_surface(10, 10, create_color(BLUE)));
-        this->Shots.push_back(shot);
-    }
-}
-
-void Engine::CheckCollisions(std::vector<AllEnemies::iterator>& enemy_iters,
-    std::vector<AllBullets::iterator>& shot_iters)
+void Engine::CheckCollisions()
 {
     for(AllEnemies::iterator i = this->Enemies.begin();
         i != this->Enemies.end(); i++)
@@ -177,49 +151,60 @@ void Engine::CheckCollisions(std::vector<AllEnemies::iterator>& enemy_iters,
         {
             if((*i)->DetectCollision((*j)))
             {
-                this->Particles->ExplodeObject((*i)->GetX(), (*i)->GetY());
-                this->score += 5;
-                enemy_iters.push_back(i);
-                shot_iters.push_back(j);
+                this->DestroyEnemy(i);
+                this->shot_iters.push_back(j);
                 return;
             }
         }
 
-        if(this->Player->DetectCollision((*i)) && (!this->debug))
+        if(this->Player->DetectCollision((*i)))
         {
-            this->quit = true;
-            return;
+            /* We delete the enemy we collided with
+             * no matter what, but only die if 
+             * debug mode is off
+             */
+            this->DestroyEnemy(i);
+
+            if(!this->debug)
+            {
+                this->quit = true;
+                return;
+            }
         }
     }
 }
 
-void Engine::RemoveEnemies(std::vector<AllEnemies::iterator>& iters)
+void Engine::DestroyEnemy(AllEnemies::iterator i)
 {
-    this->Levels->UpdateCurrentLevel(enemy_iters.size());
+    this->Particles->ExplodeObject((int)(*i)->GetX(), (int)(*i)->GetY());
+    this->score += 5;
+    this->enemy_iters.push_back(i);
+}
 
-    for(unsigned int i = 0; i < iters.size(); i++)
+void Engine::RemoveEnemies()
+{
+    this->Levels->UpdateCurrentLevel(this->enemy_iters.size());
+
+    for(unsigned int i = 0; i < this->enemy_iters.size(); i++)
     {
-        if((*iters[i])->isSpecial && SHOT_COUNT <= 5)
-            SHOT_COUNT += 2;
-
-        delete (*iters[i]);
-        this->Enemies.erase(iters[i]);
+        delete (*this->enemy_iters[i]);
+        this->Enemies.erase(this->enemy_iters[i]);
     }
 }
 
-void Engine::RemoveShots(std::vector<AllBullets::iterator>& iters)
+void Engine::RemoveShots()
 {
-    for(unsigned int i = 0; i < iters.size(); i++)
+    for(unsigned int i = 0; i < this->shot_iters.size(); i++)
     {
-        delete (*iters[i]);
-        this->Shots.erase(iters[i]);
+        delete (*this->shot_iters[i]);
+        this->Shots.erase(this->shot_iters[i]);
     }
 }
 
 void Engine::AddEnemy()
 {
     Enemy* enemy = new Enemy(this->Screen, this->Fps, this->Player);
-    enemy->SetEntity(create_surface(25, 25, create_color(YELLOW)));
+    enemy->SetEntity(LoadImage_Alpha("Circle.png"));
     this->Enemies.push_back(enemy);
 }
 
@@ -281,16 +266,19 @@ void Engine::UpdateAll()
     this->Particles->UpdateParticles();
     this->ShowDebugInfo();
 
+    /* Show the score on the screen */
     static std::stringstream ss;
     ss << "SCORE: " << this->score;
 
     SDL_Surface* score_surf = render_text(this->main_font,
         ss.str(), NULL, create_color(WHITE), CREATE_SURFACE|TRANSPARENT_BG);
-    
+
     ss.str(string());
 
     this->Screen->Blit(score_surf, 0, 0);
 
+    /* Get rid of any bullets that have gone off-screen,
+     * and any bullets not offscreen, update. */
     std::vector<AllBullets::iterator> shots_to_remove;
 
     for(AllBullets::iterator i = this->Shots.begin();
@@ -308,12 +296,14 @@ void Engine::UpdateAll()
         }
     }
 
+    /* Update each enemy */
     for(AllEnemies::iterator i = this->Enemies.begin();
         i != this->Enemies.end(); i++)
     {
         (*i)->Update();
     }
 
+    /* Remove each shot */
     for(unsigned int i = 0; i < shots_to_remove.size(); i++)
     {
         delete (*shots_to_remove[i]);
@@ -322,6 +312,7 @@ void Engine::UpdateAll()
 
     shots_to_remove.resize(0);
 
+    /* Update the entire display */
     this->Screen->Update();
     SDL_FreeSurface(score_surf);
 }

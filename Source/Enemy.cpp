@@ -3,9 +3,31 @@
 Enemy::Enemy(Display* Screen, Timer* timer, CPlayer* Player): BaseObject(Screen, timer)
 {
     if(rand() % 10 == 4)
-        this->isSpecial = true;
+    {
+        switch(rand() % TOTAL_POWERUPS)
+        {
+        case 0:
+            this->powerup = SHIELD;
+            break;
+        case 1:
+            this->powerup = MORE_SHOTS;
+            break;
+        case 2:
+            this->powerup = LOW_SHOT_DELAY;
+            break;
+        case 3:
+            this->powerup = EXTRA_LIFE;
+            break;
+        case 4:
+            this->powerup = EMP;
+            break;
+        default:
+            this->powerup = NO_POWERUP;
+            break;
+        }
+    }
     else
-        this->isSpecial = false;
+        this->powerup = NO_POWERUP;
 
     this->Player    = Player;
 
@@ -40,6 +62,7 @@ Enemy::Enemy(Display* Screen, Timer* timer, CPlayer* Player): BaseObject(Screen,
 
 Enemy::~Enemy()
 {
+    //this->Player->SetPowerUp(this->powerup);
 }
 
 void Enemy::Update()

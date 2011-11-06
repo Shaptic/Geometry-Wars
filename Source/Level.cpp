@@ -35,7 +35,7 @@ LevelManager::LevelManager()
 
         getline(file, tmp, '\n');   // Skip a blank line
         getline(file, tmp, '\n');   // We don't need LEVEL:Level#
-        
+
         Level* tmp2 = NULL;
 
         if(i == 1)
@@ -44,7 +44,7 @@ LevelManager::LevelManager()
             tmp2 = new Level;
 
         tmp2->level_id = i;
-        
+
         getline(file, tmp, '\n');
         tmp2->enemy = split(tmp, ':')[1];
 
@@ -100,7 +100,7 @@ LevelManager::LevelManager(const std::string& filename)
 
         getline(file, tmp, '\n');   // Skip a blank line
         getline(file, tmp, '\n');   // We don't need LEVEL:Level#
-        
+
         Level* tmp2 = NULL;
 
         if(i == 1)
@@ -109,7 +109,7 @@ LevelManager::LevelManager(const std::string& filename)
             tmp2 = new Level;
 
         tmp2->level_id = i;
-        
+
         getline(file, tmp, '\n');
         tmp2->enemy = split(tmp, ':')[1];
 

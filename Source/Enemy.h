@@ -3,6 +3,7 @@
 
 #include "Entity.h"
 #include "Player.h"
+#include "PowerUps.h"
 
 static const float ENEMY_SPEED = 2.5f;
 
@@ -14,7 +15,7 @@ public:
 
     void Update();
 
-    bool isSpecial;     // Gives a bonus
+    POWER_UP powerup;
 
 private:
     CPlayer* Player;
