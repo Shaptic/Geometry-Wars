@@ -134,6 +134,15 @@ void Engine::Events()
         {
             if(evt.key.keysym.sym == SDLK_BACKQUOTE)
                 this->debug = !this->debug;
+            else if(evt.key.keysym.sym == SDLK_e && this->debug)
+            {
+                /* The "e" key forces an EMP explosion */
+                Enemy emp(this->Screen, this->Fps, this->Player);
+                emp.SetPowerUp(EMP);
+                std::list<Enemy*> tmp;
+                tmp.push_back(&emp);
+                this->DestroyEnemy(tmp.begin());
+            }
         }
     }
 
@@ -163,7 +172,13 @@ void Engine::CheckCollisions()
              * no matter what, but only die if 
              * debug mode is off
              */
-            this->DestroyEnemy(i);
+            if((*i)->GetPowerUp()->ability == EMP)
+            {
+                this->DestroyEnemy(i);
+                return;
+            }
+            else
+                this->DestroyEnemy(i);
 
             if(!this->debug)
             {
@@ -176,9 +191,33 @@ void Engine::CheckCollisions()
 
 void Engine::DestroyEnemy(AllEnemies::iterator i)
 {
-    this->Particles->ExplodeObject((int)(*i)->GetX(), (int)(*i)->GetY());
-    this->score += 5;
-    this->enemy_iters.push_back(i);
+    if((*i)->GetPowerUp()->ability == EMP)
+    {
+        /* EMP Destroys all enemies on the screen */
+
+        /* First we update the level info */
+        this->Levels->UpdateCurrentLevel(Enemies.size());
+
+        /* Then the score, 5 * all the enemies destroyed */
+        this->score += (this->Enemies.size() * 5);
+        
+        /* Then we create an explosion for every enemy on screen */
+        for(AllEnemies::iterator j = this->Enemies.begin();
+            j != this->Enemies.end(); j++)
+        {
+            this->Particles->ExplodeObject((int)(*j)->GetX(), (int)(*j)->GetY());
+        }
+
+        /* Then we remove the enemies */
+        this->Enemies.clear();
+        this->enemy_iters.clear();
+    }
+    else
+    {
+        this->Particles->ExplodeObject((int)(*i)->GetX(), (int)(*i)->GetY());
+        this->score += 5;
+        this->enemy_iters.push_back(i);
+    }
 }
 
 void Engine::RemoveEnemies()
@@ -204,7 +243,6 @@ void Engine::RemoveShots()
 void Engine::AddEnemy()
 {
     Enemy* enemy = new Enemy(this->Screen, this->Fps, this->Player);
-    enemy->SetEntity(LoadImage_Alpha("Circle.png"));
     this->Enemies.push_back(enemy);
 }
 

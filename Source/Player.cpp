@@ -1,6 +1,5 @@
 #include "Player.h"
 
-
 CPlayer::CPlayer(Display* Screen, Timer* timer): BaseObject(Screen, timer)
 {
     this->SetEntity(create_surface(20, 20, create_color(GREEN)));
@@ -16,11 +15,15 @@ CPlayer::CPlayer(Display* Screen, Timer* timer): BaseObject(Screen, timer)
 
     this->to_shoot = 1;
 
-    this->powerup = NO_POWERUP;
+    this->current_powerup   = NULL;
 }
 
 CPlayer::~CPlayer()
 {
+    if(this->current_powerup != NULL)
+        delete this->current_powerup;
+
+    this->all_powerups.clear();
 }
 
 void CPlayer::Shoot(std::list<Bullet*>& shots)
@@ -70,21 +73,36 @@ void CPlayer::Blit()
     if(this->shot_delay > 0)
         this->shot_delay--;
 
+    /* Check for invalid powerups */
+    for(std::list<PowerUp*>::iterator i = this->all_powerups.begin();
+        i != this->all_powerups.end(); i++)
+    {
+        (*i)->duration--;
+        if((*i)->duration == 0)
+        {
+            if((*i)->ability == LOW_SHOT_DELAY)
+                SHOT_DELAY = REGULAR_SHOT_DELAY;
+            else if((*i)->ability == MORE_SHOTS)
+                this->to_shoot -= this->to_shoot > 2 ? 2 : 0;
+
+            delete (*i);
+            this->all_powerups.erase(i);
+            break;
+        }
+    }
+
     /* Update the entity on the screen. */
     if(this->main_entity != NULL)
         this->display->Blit(this->main_entity, (int)this->x, (int)this->y);
 }
 
-void CPlayer::SetPowerUp(POWER_UP m_powerup)
+void CPlayer::SetPowerUp(PowerUp* powerup)
 {
-    printf("0x%x; %d\n", m_powerup, m_powerup & MORE_SHOTS);
-    if(this->powerup & NO_POWERUP)
-        this->powerup &= ~NO_POWERUP;
-    if(m_powerup == NO_POWERUP)
-        this->powerup = NO_POWERUP;
-    else
-        this->powerup |= m_powerup;
-
-    if(this->powerup & MORE_SHOTS)
+    if(powerup->ability == LOW_SHOT_DELAY)
+        SHOT_DELAY = LOWERED_SHOT_DELAY;
+    else if(powerup->ability == MORE_SHOTS && this->to_shoot < MAX_SHOTS)
         this->to_shoot += 2;
+
+    this->current_powerup = powerup;
+    this->all_powerups.push_back(powerup);
 }

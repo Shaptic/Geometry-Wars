@@ -14,8 +14,16 @@ public:
     ~Enemy();
 
     void Update();
+    PowerUp* GetPowerUp(){return this->powerup;}
+    void SetPowerUp(int ability)
+    {
+        delete this->powerup;
+        this->powerup = new PowerUp;
+        this->powerup->duration = POWERUP_DURATION;
+        this->powerup->ability = (POWERUPS)ability;
+    }
 
-    POWER_UP powerup;
+    PowerUp* powerup;
 
 private:
     CPlayer* Player;

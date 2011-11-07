@@ -2,32 +2,45 @@
 
 Enemy::Enemy(Display* Screen, Timer* timer, CPlayer* Player): BaseObject(Screen, timer)
 {
+    this->LoadEntity("Circle.png");
+
+    this->powerup = new PowerUp;
+
     if(rand() % 10 == 4)
     {
         switch(rand() % TOTAL_POWERUPS)
         {
         case 0:
-            this->powerup = SHIELD;
+            this->powerup->duration = POWERUP_DURATION;
+            this->powerup->ability  = SHIELD;
             break;
         case 1:
-            this->powerup = MORE_SHOTS;
+            this->powerup->duration = POWERUP_DURATION;
+            this->powerup->ability  = MORE_SHOTS;
             break;
         case 2:
-            this->powerup = LOW_SHOT_DELAY;
+            this->powerup->duration = POWERUP_DURATION;
+            this->powerup->ability  = LOW_SHOT_DELAY;
             break;
         case 3:
-            this->powerup = EXTRA_LIFE;
+            this->powerup->duration = 1;
+            this->powerup->ability  = EXTRA_LIFE;
             break;
         case 4:
-            this->powerup = EMP;
+            this->powerup->duration = 1;
+            this->powerup->ability  = EMP;
             break;
         default:
-            this->powerup = NO_POWERUP;
+            this->powerup->duration = 1;
+            this->powerup->ability  = NO_POWERUP;
             break;
         }
     }
     else
-        this->powerup = NO_POWERUP;
+    {
+        this->powerup->duration = 1;
+        this->powerup->ability = NO_POWERUP;
+    }
 
     this->Player    = Player;
 
@@ -62,7 +75,7 @@ Enemy::Enemy(Display* Screen, Timer* timer, CPlayer* Player): BaseObject(Screen,
 
 Enemy::~Enemy()
 {
-    //this->Player->SetPowerUp(this->powerup);
+    this->Player->SetPowerUp(this->powerup);
 }
 
 void Enemy::Update()

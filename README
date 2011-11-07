@@ -9,8 +9,8 @@ Dependencies:
 
 Controls:
     WASD or Arrow Keys to move your ship. Aim with your mouse
-    and click to fire. Press ~ to enable debug mode, and Q to
-    spawn enemies while in debug mode.
+    and click to fire. Press ~ to enable debug mode. In debug
+    mode, Q will spawn enemies, and E will force an EMP strike.
     
 Changelog:
     Version 0.1 (10.22.11)
@@ -33,8 +33,15 @@ Changelog:
         - Added a shot delay
         
     Version 0.2.2 (11.5.11)
+        - Added a single enemy graphic
         - In debug mode, touching an enemy kills it
         - More stable levels
         - Player controls shooting rather than engine
         
+    Version 0.3 (11.6.11)
+        - Added some powerups:
+            - EMP: Explodes all current enemies
+            - LowShotDelay: Increases rate of fire
+            - MoreShots: Shoot a bigger spread of bullets
+        - Pressing "E" while in Debug Mode forces an EMP explosion        
     

@@ -8,7 +8,9 @@
 #include "PowerUps.h"
 
 /* Between shots, in frames, not seconds */
-static const int SHOT_DELAY = 5;
+static const int REGULAR_SHOT_DELAY = 5;
+static const int LOWERED_SHOT_DELAY = 2;
+static int SHOT_DELAY               = REGULAR_SHOT_DELAY;
 
 /* The angle that each shot (not counting the first shot)
  * is fired at from the "barrel"
@@ -28,15 +30,17 @@ public:
 
     void Shoot(std::list<Bullet*>& bullets);
     bool CanShoot();
+    bool CanDie();
     void Blit();
-    void SetPowerUp(POWER_UP m_powerup);
+    void SetPowerUp(PowerUp* m_powerup);
 
 private:
-    int to_shoot;   // Amount of shots / burst
-    int shot_delay; // Delay between bursts
+    unsigned int to_shoot;   // Amount of shots / burst
+    unsigned int shot_delay; // Delay between bursts
     int mouse_aim_x, mouse_aim_y;   // Mouse location
 
-    POWER_UP powerup;
+    PowerUp* current_powerup;
+    std::list<PowerUp*> all_powerups;
 };
 
 #endif // PLAYER_H
