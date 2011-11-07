@@ -37,6 +37,7 @@ Changelog:
         - In debug mode, touching an enemy kills it
         - More stable levels
         - Player controls shooting rather than engine
+        - Added a "tail" to the player to simulate the fuel from a rocketship
         
     Version 0.3 (11.6.11)
         - Added some powerups:
