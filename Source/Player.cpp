@@ -20,9 +20,6 @@ CPlayer::CPlayer(Display* Screen, Timer* timer): BaseObject(Screen, timer)
 
 CPlayer::~CPlayer()
 {
-    if(this->current_powerup != NULL)
-        delete this->current_powerup;
-
     this->all_powerups.clear();
 }
 
