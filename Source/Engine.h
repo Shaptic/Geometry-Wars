@@ -32,8 +32,12 @@ public:
     Engine();
     ~Engine();
 
+    void Menu();
     void Play();
+    void NewGame();
+
 private:
+    void LoadHighScore();
     void Events();
 
     void AddEnemy();
@@ -47,7 +51,7 @@ private:
     void UpdateAll();
 
     Display*        Screen;
-    Menu*           MainMenu;
+    CMenu*          MainMenu;
     CPlayer*        Player;
     AllEnemies      Enemies;
     AllBullets      Shots;
@@ -64,6 +68,7 @@ private:
     bool            debug;
 
     int             score;
+    int             high_score;
 };
 
 #endif // ENGINE_H

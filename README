@@ -50,3 +50,8 @@ Changelog:
         - Fixed a segfault occuring after the game ended
         - Removed the console window popup
     
+    Version 0.3.5 (11.10.11)
+        - Added high score tracking
+            - Doesn't record scores while debug mode is enabled
+        - Fixed tiny menu bug
+        - Fixed memory leak in level handler

@@ -130,6 +130,16 @@ LevelManager::LevelManager(const std::string& filename)
     this->CurrentLevel = this->Levels;
 }
 
+LevelManager::~LevelManager()
+{
+    for(Level* tmp = this->Levels; tmp != NULL; )
+    {
+        Level* tmp2 = tmp;
+        tmp = tmp->NextLevel;
+        delete tmp2;
+    }
+}
+
 bool LevelManager::CanSpawn(const int frame)
 {
     if(this->spawned >= this->CurrentLevel->enemy_count)

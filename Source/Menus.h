@@ -2,7 +2,7 @@
  * and functions to easily create customizable
  * and versatile menus.
  *
- * Special return values from Menu::Run():
+ * Special return values from CMenu::Run():
  *
  * -1       - Return to last menu
  * -2       - Quit game completely
@@ -60,7 +60,7 @@ using std::vector;
 using std::string;
 
 /* Forward declaration of the Menu class. */
-class Menu;
+class CMenu;
 
 /* Identifiers for various button types
  * that can be used within a menu. A generic
@@ -100,7 +100,7 @@ struct Button
 
     SDL_Rect        mouseOver;      // Detect collision with mouse
 
-    Menu*           subMenu;        // If button is a submenu, this is it
+    CMenu*          subMenu;        // If button is a submenu, this is it
 
     BUTTON_TYPE     btn_type;       // ID for button type
     ACTION_TYPE     act_type;       // What does the button do?
@@ -119,18 +119,18 @@ struct Button
                                     // turned on or off?
 };
 
-class Menu
+class CMenu
 {
 public:
     /* Overloaded constructor so the user can
      * either choose to create a Display and Events
      * member, or use a previously created one.
      */
-    Menu();
-    Menu(Display* display);
-    Menu(Display* display, Events* eventHandler);
+    CMenu();
+    CMenu(Display* display);
+    CMenu(Display* display, Events* eventHandler);
 
-    ~Menu();
+    ~CMenu();
 
     /* Set a background for the menu. Can be used
      * to load a file, or use a pre-loaded surface.
@@ -183,7 +183,7 @@ public:
             const char* text, 
             BUTTON_TYPE btn,
             ACTION_TYPE act,
-            Menu*       SubMenu     = NULL,
+            CMenu*      SubMenu     = NULL,
             bool        onByDefault = true);
 
     /* Remove an option from the menu. This makes it easy to
@@ -213,7 +213,7 @@ private:
     /* Private methods for adding various types
      * of buttons to the menu.
      */
-    int  AddSubMenu(const char* text, Menu* SubMenu);
+    int  AddSubMenu(const char* text, CMenu* SubMenu);
     int  AddAction (const char* text, ACTION_TYPE act);
     int  AddToggle (const char* text, bool onByDefault);
     int  AddGeneric(const char* text);

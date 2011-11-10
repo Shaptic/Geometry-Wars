@@ -10,7 +10,7 @@ Engine::Engine()
     this->main_font     = TTF_OpenFont("C:\\Windows\\Fonts\\Arial.ttf", 24);
 
     this->Screen        = new Display(800, 600);
-    this->MainMenu      = new Menu(this->Screen);
+    this->MainMenu      = new CMenu(this->Screen);
     this->Levels        = new LevelManager();
     this->Fps           = new Timer();
     this->Particles     = new ParticleEngine(this->Screen, this->Fps);
@@ -34,6 +34,9 @@ Engine::Engine()
 
     this->quit          = false;
     this->score         = 0;
+    this->high_score    = 0;
+
+    this->LoadHighScore();
 }
 
 Engine::~Engine()
@@ -45,15 +48,31 @@ Engine::~Engine()
 
     this->Enemies.clear();
     this->Shots.clear();
+
+    /* Write the highscore to a file */
+    std::ofstream hs("highscores.dat", std::ios::in | std::ios::trunc);
+    if(hs.bad() || !hs.is_open())
+        handleError("Unable to record score!");
+
+    int hash = 10 + rand() % 10;
+    hs << this->high_score * hash << hash << "\n";
+
+    hs.close();
+}
+
+void Engine::Menu()
+{
+    if(this->MainMenu->Run() == QUIT_ID)
+        return;
+    else
+    {
+        SDL_Delay(100);
+        this->Play();
+    }
 }
 
 void Engine::Play()
 {
-    if(this->MainMenu->Run() == QUIT_ID)
-        return;
-
-    SDL_Delay(100);
-
     /* Some local game values, for handling 
      * mouse, keyboard, speeds, exiting, etc.
      */
@@ -81,6 +100,9 @@ void Engine::Play()
 
         /* Handle our events */
         this->Events();
+
+        if(CheckQuit())
+            this->quit = true;
 
         if(IsDown(SDLK_UP) || IsDown(SDLK_w))
             dy = -PLAYER_SPEED;
@@ -118,6 +140,59 @@ void Engine::Play()
          */
         this->UpdateAll();
     }
+}
+
+void Engine::NewGame()
+{
+    this->quit = false;
+
+#ifdef _DEBUG
+    this->debug = true;
+#else
+    this->debug = false;
+#endif // _DEBUG
+
+    /* Restart levels */
+    delete this->Levels;
+    this->Levels = new LevelManager();
+    
+    /* Renew player */
+    delete this->Player;
+    this->Player = new CPlayer(this->Screen, this->Fps);
+
+    /* Renew particle engine */
+    delete this->Particles;
+    this->Particles = new ParticleEngine(this->Screen, this->Fps);
+
+    /* Remove all entities on the screen */
+    this->Enemies.clear();
+    this->Shots.clear();
+    this->enemy_iters.clear();
+    this->shot_iters.clear();
+
+    /* Move player to center, reset score */
+    this->Player->Move_Force(this->Screen->width / 2, this->Screen->height / 2);
+    this->score = 0;
+
+    this->Play();
+}
+
+void Engine::LoadHighScore()
+{
+    std::string tmp;
+    std::ifstream hs("highscores.dat");
+
+    if(!hs.is_open())
+        this->high_score = 0;
+    else
+    {
+        std::getline(hs, tmp, '\n');
+        int hash = atoi(tmp.substr(tmp.length() - 2, -1).c_str());
+        this->high_score = atoi(tmp.substr(0, tmp.length() - 2).c_str()) / hash;
+        tmp.clear();
+    }
+
+    hs.close();
 }
 
 void Engine::Events()
@@ -182,7 +257,11 @@ void Engine::CheckCollisions()
 
             if(!this->debug)
             {
-                this->quit = true;
+                if(MessageBoxA(NULL, "You died! Do you want to play again?", "Play Again?", MB_YESNO) == IDYES)
+                    this->NewGame();
+                else
+                    this->quit = true;
+
                 return;
             }
         }
@@ -198,9 +277,16 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
         /* First we update the level info */
         this->Levels->UpdateCurrentLevel(Enemies.size());
 
-        /* Then the score, 5 * all the enemies destroyed */
-        this->score += (this->Enemies.size() * 5);
+        /* Then the score, 5 * all the enemies destroyed, but
+         * only if it was used non-cheating.
+         */
+        if(!this->debug)
+            this->score += (this->Enemies.size() * 5);
         
+        /* We update the highscore if it has been reached */
+        if(this->score > this->high_score)
+            this->high_score = this->score;
+
         /* Then we create an explosion for every enemy on screen */
         for(AllEnemies::iterator j = this->Enemies.begin();
             j != this->Enemies.end(); j++)
@@ -214,9 +300,17 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
     }
     else
     {
+        /* Generate explosion */
         this->Particles->ExplodeObject((int)(*i)->GetX(), (int)(*i)->GetY());
-        this->score += 5;
+
+        /* Increase score and add enemy for deletion */
+        if(!this->debug)
+            this->score += 5;
         this->enemy_iters.push_back(i);
+
+        /* We update the highscore if it has been reached */
+        if(this->score > this->high_score)
+            this->high_score = this->score;
     }
 }
 
@@ -312,8 +406,15 @@ void Engine::UpdateAll()
         ss.str(), NULL, create_color(WHITE), CREATE_SURFACE|TRANSPARENT_BG);
 
     ss.str(string());
+    ss << "HIGHSCORE: " << this->high_score;
+
+    SDL_Surface* hs_surf = render_text(this->main_font, ss.str(),
+        NULL, create_color(WHITE), CREATE_SURFACE | TRANSPARENT_BG);
 
     this->Screen->Blit(score_surf, 0, 0);
+    this->Screen->Blit(hs_surf, this->Screen->width - get_text_width(this->main_font, ss.str()), 0);
+
+    ss.str(string());
 
     /* Get rid of any bullets that have gone off-screen,
      * and any bullets not offscreen, update. */

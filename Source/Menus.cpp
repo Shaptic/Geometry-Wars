@@ -3,7 +3,7 @@
 
 using std::string;
 
-Menu::Menu()
+CMenu::CMenu()
 {
     this->display       = new Display();
     this->eventHandler  = new Events();
@@ -11,7 +11,7 @@ Menu::Menu()
     this->Initialize();
 }
 
-Menu::Menu(Display* display)
+CMenu::CMenu(Display* display)
 {
     this->display       = display;
     this->eventHandler  = new Events();
@@ -19,7 +19,7 @@ Menu::Menu(Display* display)
     this->Initialize();
 }
 
-Menu::Menu(Display* display, Events* eventHandler)
+CMenu::CMenu(Display* display, Events* eventHandler)
 {
     this->display       = display;
     this->eventHandler  = eventHandler;
@@ -27,7 +27,7 @@ Menu::Menu(Display* display, Events* eventHandler)
     this->Initialize();
 }
 
-Menu::~Menu()
+CMenu::~CMenu()
 {
     for(unsigned int i=0; i < this->buttons.size(); i++)
     {
@@ -38,7 +38,7 @@ Menu::~Menu()
     this->buttons.clear();
 }
 
-bool Menu::Initialize()
+bool CMenu::Initialize()
 {
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) == -1)
         return false;
@@ -68,93 +68,93 @@ bool Menu::Initialize()
     return true;
 }
 
-void Menu::SetBackground(SDL_Surface* bg)
+void CMenu::SetBackground(SDL_Surface* bg)
 {
     this->bg = bg;
 }
 
-void Menu::SetBackground(const char* filename)
+void CMenu::SetBackground(const char* filename)
 {
     this->bg = LoadImage(filename);
 }
 
-void Menu::SetBackground(const string& filename)
+void CMenu::SetBackground(const string& filename)
 {
     this->SetBackground(filename.c_str());
 }
 
-void Menu::SetFont(TTF_Font* font)
+void CMenu::SetFont(TTF_Font* font)
 {
     this->font = font;
 }
 
-void Menu::SetFont(const char* font_name)
+void CMenu::SetFont(const char* font_name)
 {
     this->font = TTF_OpenFont(font_name, 32);
 }
 
-void Menu::SetFont(const string& font_name)
+void CMenu::SetFont(const string& font_name)
 {
     this->SetFont(font_name.c_str());
 }
 
-void Menu::SetTextColor(const int r, const int g, const int b)
+void CMenu::SetTextColor(const int r, const int g, const int b)
 {
     this->txtColor = create_color(r, g, b);
 }
 
-void Menu::SetTextColor(const SDL_Color& color)
+void CMenu::SetTextColor(const SDL_Color& color)
 {
     this->txtColor = color;
 }
 
-void Menu::SetHighLightColor(const int r, const int g, const int b)
+void CMenu::SetHighLightColor(const int r, const int g, const int b)
 {
     this->hlColor = create_color(r, g, b);
 }
 
-void Menu::SetHighLightColor(const SDL_Color& color)
+void CMenu::SetHighLightColor(const SDL_Color& color)
 {
     this->hlColor = color;
 }
 
-void Menu::SetMusic(const char* filename)
+void CMenu::SetMusic(const char* filename)
 {
     this->music = Mix_LoadMUS(filename);
 }
 
-void Menu::SetMusic(const string& filename)
+void CMenu::SetMusic(const string& filename)
 {
     this->SetMusic(filename.c_str());
 }
 
-void Menu::SetMusic(Mix_Music* music)
+void CMenu::SetMusic(Mix_Music* music)
 {
     this->music = music;
 }
 
-void Menu::SetStartCoordinates(const int x, const int y)
+void CMenu::SetStartCoordinates(const int x, const int y)
 {
     this->x = x;
     this->y = y;
 }
 
-void Menu::SetStartCoordinatesInScreenCenter()
+void CMenu::SetStartCoordinatesInScreenCenter()
 {
     this->x = SCREEN_WIDTH / 2;
     this->y = SCREEN_HEIGHT / 2;
 }
 
-void Menu::SetCenterText(bool toggle)
+void CMenu::SetCenterText(bool toggle)
 {
     this->center = toggle;
 }
 
- int Menu::AddMenuOption(
+ int CMenu::AddMenuOption(
             const char* text, 
             BUTTON_TYPE btn,
             ACTION_TYPE act,
-            Menu*       SubMenu,
+            CMenu*      SubMenu,
             bool        onByDefault)
 {
     switch(btn)
@@ -185,12 +185,12 @@ void Menu::SetCenterText(bool toggle)
     }
 }
 
- void Menu::RemoveMenuOption(const int id)
+ void CMenu::RemoveMenuOption(const int id)
  {
      this->buttons[id] = NULL;
  }
 
- int Menu::FindMenuOptionByText(const char* text)
+ int CMenu::FindMenuOptionByText(const char* text)
  {
      for(unsigned int i=0; i < this->buttons.size(); i++)
      {
@@ -204,7 +204,7 @@ void Menu::SetCenterText(bool toggle)
      return -1;
  }
 
-void Menu::CheckMouseOver(int mouse_x, int mouse_y)
+void CMenu::CheckMouseOver(int mouse_x, int mouse_y)
 {
     for(unsigned int i=0; i < this->buttons.size(); i++)
     {
@@ -220,7 +220,7 @@ void Menu::CheckMouseOver(int mouse_x, int mouse_y)
     }
 }
 
-int Menu::CheckClick(const int x, const int y)
+int CMenu::CheckClick(const int x, const int y)
 {
     for(unsigned int i=0; i < this->buttons.size(); i++)
     {
@@ -230,7 +230,7 @@ int Menu::CheckClick(const int x, const int y)
     return -1;
 }
 
-int Menu::AddAction(const char* text, ACTION_TYPE act)
+int CMenu::AddAction(const char* text, ACTION_TYPE act)
 {
     this->buttons.push_back(new Button);
 
@@ -293,7 +293,7 @@ int Menu::AddAction(const char* text, ACTION_TYPE act)
     return this->buttons[LAST]->id;
 }
 
-int Menu::AddToggle(const char* text, bool on)
+int CMenu::AddToggle(const char* text, bool on)
 {
     this->buttons.push_back(new Button);
 
@@ -345,7 +345,7 @@ int Menu::AddToggle(const char* text, bool on)
     return this->buttons[LAST]->id;
 }
 
-int Menu::AddSubMenu(const char* text, Menu* nextMenu)
+int CMenu::AddSubMenu(const char* text, CMenu* nextMenu)
 {
     if(nextMenu == NULL)
         return -1;
@@ -400,7 +400,7 @@ int Menu::AddSubMenu(const char* text, Menu* nextMenu)
     return this->buttons[LAST]->id;
 }
 
-int Menu::AddText(const char* text)
+int CMenu::AddText(const char* text)
 {
     this->buttons.push_back(new Button);
 
@@ -451,7 +451,7 @@ int Menu::AddText(const char* text)
     return this->buttons[LAST]->id;
 }
 
-int Menu::AddGeneric(const char* text)
+int CMenu::AddGeneric(const char* text)
 {
     this->buttons.push_back(new Button);
 
@@ -506,7 +506,7 @@ int Menu::AddGeneric(const char* text)
     return this->buttons[LAST]->id;
 }
 
-int Menu::Run()
+int CMenu::Run()
 {
     int mouse_x, mouse_y;
     int status = -1;
@@ -642,7 +642,7 @@ int Menu::Run()
     return -2;
 }
 
-int Menu::RunNoBlock(const int framesToRunFor)
+int CMenu::RunNoBlock(const int framesToRunFor)
 {
     int count = 0;
     int mouse_x, mouse_y;
