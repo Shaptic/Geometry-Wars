@@ -80,13 +80,20 @@ void ParticleEngine::GenerateEMP(const int m_x, const int m_y)
 }
 */
 
-void ParticleEngine::ExplodeObject(const int x, const int y)
+void ParticleEngine::ExplodeObject(BaseObject* obj)
 {
     /* We will spawn anywhere from 10-30 "bits" that
      * are left-over from the destroyed enemy.
      */
     const int bits = 10 + (rand() % 20);
     int dx, dy;
+
+    /* Obtain pixel color for explosions */
+    Uint8 r, g, b;
+    SDL_GetRGB(get_pixel(obj->GetEntity(), 0, 0), 
+        obj->GetEntity()->format, &r, &g, &b);
+
+    SDL_Color color = {r, g, b};
 
     for(short i = 0; i < bits; i++)
     {
@@ -101,7 +108,9 @@ void ParticleEngine::ExplodeObject(const int x, const int y)
         else
             dy = (5 + (rand() % 5));
 
-        this->particles.push_back(new Bit(this->Screen, this->timer, x, y, dx, dy, 25 + rand() % 25));
+        this->particles.push_back(new Bit(this->Screen, this->timer,
+            (int)obj->GetX(), (int)obj->GetY(), dx, dy,
+            25 + rand() % 25, color));
     }
 }
 
@@ -135,7 +144,6 @@ void ParticleEngine::ExplodePlayer(const int x, const int y)
             green));
     }
 }
-
 
 void ParticleEngine::AddPlayerTrail(CPlayer* player, const int dx, const int dy)
 {

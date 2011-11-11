@@ -57,7 +57,7 @@ Changelog:
         - Fixed memory leak in level handler
         - Added the ability to start over after dying [Windows only]
         
-    Version 0.3.6 (11.10.11)
+    Version 0.3.9 (11.10.11)
         - Added lives
         - Added "Extra Life" powerup
         - Balanced out power-up spawning
@@ -65,3 +65,8 @@ Changelog:
         - "Encrypted" highscore
         - Optimized particle engine
         - Now levels contain filenames for enemies
+        - Added a several new graphics for enemies
+        - Explosions are now always the same color as the enemy
+        - Fixed a bug where sometimes the player would die, turning
+          invisible for a few seconds, then being visible again, and
+          invincible as well, because the life count dropped below 0

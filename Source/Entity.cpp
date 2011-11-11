@@ -295,7 +295,7 @@ float BaseObject::GetY() const
     return this->y;
 }
 
-const SDL_Surface* BaseObject::GetEntity() const
+SDL_Surface* BaseObject::GetEntity() const
 {
     return this->main_entity;
 }

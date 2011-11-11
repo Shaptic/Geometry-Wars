@@ -72,7 +72,7 @@ bool CPlayer::CanShoot()
 
 bool CPlayer::IsDead()
 {
-    return (this->lives == 0);
+    return (this->lives <= 0);
 }
 
 void CPlayer::Blit()

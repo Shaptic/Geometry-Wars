@@ -76,7 +76,7 @@ public:
     float  GetX() const;
     float  GetY() const;
 
-    const SDL_Surface* GetEntity() const;
+    SDL_Surface* GetEntity() const;
     const SDL_Rect*    GetCollisionBoundaries() const;
 
 protected:

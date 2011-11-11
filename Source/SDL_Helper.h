@@ -67,6 +67,8 @@ int             get_text_width(TTF_Font* font, const std::string& text);
 bool            detect_collision(const SDL_Rect& obj1, const SDL_Rect& obj2);
 bool            detect_collision(const SDL_Rect* obj1, const SDL_Rect* obj2);
 
+Uint32          get_pixel(SDL_Surface* surface, int x, int y);
+
 #endif // SDL_HELPER_H
 
 

@@ -318,7 +318,7 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
         for(AllEnemies::iterator j = this->Enemies.begin();
             j != this->Enemies.end(); j++)
         {
-            this->Particles->ExplodeObject((int)(*j)->GetX(), (int)(*j)->GetY());
+            this->Particles->ExplodeObject((*j));
         }
 
         /* Then we remove the enemies */
@@ -328,7 +328,7 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
     else
     {
         /* Generate explosion */
-        this->Particles->ExplodeObject((int)(*i)->GetX(), (int)(*i)->GetY());
+        this->Particles->ExplodeObject((*i));
 
         /* Increase score and add enemy for deletion */
         if(!this->debug)
