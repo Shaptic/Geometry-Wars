@@ -7,14 +7,13 @@
 #include "Bullet.h"
 #include "PowerUps.h"
 
-using namespace PowerUps;
-
 class CPlayer: public CBaseObject
 {
 public:
     CPlayer(CDisplay& Screen, CTimer& timer);
     ~CPlayer();
 
+    void Reset();
     void Shoot(std::list<CBullet*>& bullets);
     void Kill();
     bool CanShoot();
@@ -29,8 +28,6 @@ private:
     static const int REGULAR_SHOT_DELAY = 5;
     static const int LOWERED_SHOT_DELAY = 2;
     
-    int SHOT_DELAY;
-
     /* The angle that each shot (not counting the first shot)
      * is fired at from the "barrel"
      */
@@ -41,12 +38,12 @@ private:
      */
     static const int MAX_SHOTS = 5;
 
+    unsigned int SHOT_DELAY;
     unsigned int lives;
-    unsigned int to_shoot;   // Amount of shots / burst
-    unsigned int shot_delay; // Delay between bursts
+    unsigned int to_shoot;          // Amount of shots / burst
+    unsigned int shot_delay;        // Delay between bursts
     int mouse_aim_x, mouse_aim_y;   // Mouse location
 
-    PowerUp* current_powerup;
     std::list<PowerUp*> all_powerups;
 };
 

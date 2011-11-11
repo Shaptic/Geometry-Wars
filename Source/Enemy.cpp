@@ -1,7 +1,7 @@
 #include "Enemy.h"
 
-CEnemy::CEnemy(CDisplay& Screen, CTimer& m_Timer, CPlayer& m_Player,
-    const std::string& filename): Player(m_Player), CBaseObject(Screen, m_Timer),
+CEnemy::CEnemy(CDisplay& m_Screen, CTimer& m_Timer, CPlayer& m_Player,
+    const std::string& filename): Player(m_Player), CBaseObject(m_Screen, m_Timer),
     ENEMY_SPEED(2.5f)
 {
     this->LoadEntity(filename.c_str());
@@ -10,21 +10,21 @@ CEnemy::CEnemy(CDisplay& Screen, CTimer& m_Timer, CPlayer& m_Player,
 
     if(rand() % 10 == 4)
     {
-        switch(rand() % TOTAL_POWERUPS)
+        switch(rand() % PowerUp::TOTAL_POWERUPS)
         {
         case 0:
             this->powerup->duration = POWERUP_DURATION;
-            this->powerup->ability  = SHIELD;
+            this->powerup->ability  = PowerUp::SHIELD;
             break;
 
         case 1:
             this->powerup->duration = POWERUP_DURATION;
-            this->powerup->ability  = MORE_SHOTS;
+            this->powerup->ability  = PowerUp::MORE_SHOTS;
             break;
 
         case 2:
             this->powerup->duration = POWERUP_DURATION;
-            this->powerup->ability  = LOW_SHOT_DELAY;
+            this->powerup->ability  = PowerUp::LOW_SHOT_DELAY;
             break;
 
         case 3:
@@ -32,12 +32,12 @@ CEnemy::CEnemy(CDisplay& Screen, CTimer& m_Timer, CPlayer& m_Player,
             if(rand() % 10 == 6)
             {
                 this->powerup->duration = 1;
-                this->powerup->ability  = EXTRA_LIFE;
+                this->powerup->ability  = PowerUp::EXTRA_LIFE;
             }
             else
             {
                 this->powerup->duration = 1;
-                this->powerup->ability  = NO_POWERUP;
+                this->powerup->ability  = PowerUp::NO_POWERUP;
             }
             break;
 
@@ -46,25 +46,25 @@ CEnemy::CEnemy(CDisplay& Screen, CTimer& m_Timer, CPlayer& m_Player,
             if(rand() % 2 == 1)
             {
                 this->powerup->duration = 1;
-                this->powerup->ability  = EMP;
+                this->powerup->ability  = PowerUp::EMP;
             }
             else
             {
                 this->powerup->duration = 1;
-                this->powerup->ability  = NO_POWERUP;
+                this->powerup->ability  = PowerUp::NO_POWERUP;
             }
             break;
 
         default:
             this->powerup->duration = 1;
-            this->powerup->ability  = NO_POWERUP;
+            this->powerup->ability  = PowerUp::NO_POWERUP;
             break;
         }
     }
     else
     {
         this->powerup->duration = 1;
-        this->powerup->ability = NO_POWERUP;
+        this->powerup->ability = PowerUp::NO_POWERUP;
     }
 
     /* We must pick a random side offscreen to

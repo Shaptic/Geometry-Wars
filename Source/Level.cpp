@@ -140,6 +140,13 @@ CLevelManager::~CLevelManager()
     }
 }
 
+void CLevelManager::Reset()
+{
+    this->CurrentLevel = this->Levels;
+    this->enemies_remaining = this->CurrentLevel->enemy_count;
+    this->spawned = 0;
+}
+
 bool CLevelManager::CanSpawn(const int frame)
 {
     if(this->spawned >= this->CurrentLevel->enemy_count)

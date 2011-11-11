@@ -51,14 +51,14 @@ private:
     void UpdateAll();
 
     CDisplay            Screen;
+    CTimer              Fps;
     CEvents             EventHandler;
     CMenu               MainMenu;
     CPlayer             Player;
-    AllEnemies          Enemies;
-    AllBullets          Shots;
     CLevelManager       Levels;
     CParticleEngine     Particles;
-    CTimer              Fps;
+    AllEnemies          Enemies;
+    AllBullets          Shots;
 
     EnemyIterator       enemy_iters;
     ShotIterator        shot_iters;
@@ -67,8 +67,8 @@ private:
 
     bool                quit;       // Quit the game
     bool                play_again; // Is playing again a possibility?
-                                // Setting to false means no "Play Again?"
-                                // prompt after quit = true
+                                    // Setting to false means no "Play Again?"
+                                    // prompt after quit = true
     bool                debug;
 
     int                 score;

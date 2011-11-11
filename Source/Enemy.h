@@ -5,8 +5,6 @@
 #include "Player.h"
 #include "PowerUps.h"
 
-using namespace PowerUps;
-
 class CEnemy: public CBaseObject
 {
 public:
@@ -15,12 +13,12 @@ public:
 
     void Update();
     PowerUp* GetPowerUp(){return this->powerup;}
-    void SetPowerUp(int ability)
+    void SetPowerUp(PowerUp::POWERUPS ability)
     {
         delete this->powerup;
         this->powerup = new PowerUp;
         this->powerup->duration = POWERUP_DURATION;
-        this->powerup->ability = (POWERUPS)ability;
+        this->powerup->ability = ability;
     }
 
     PowerUp* powerup;

@@ -16,13 +16,32 @@ CPlayer::CPlayer(CDisplay& Screen, CTimer& timer): CBaseObject(Screen, timer)
     this->to_shoot = 1;
     this->SHOT_DELAY = REGULAR_SHOT_DELAY;
 
-    this->current_powerup   = NULL;
     this->lives             = 1;
 }
 
 CPlayer::~CPlayer()
 {
+    for(std::list<PowerUp*>::iterator i = this->all_powerups.begin();
+        i != this->all_powerups.end(); i++)
+    {
+        delete (*i);
+    }
+
     this->all_powerups.clear();
+}
+
+void CPlayer::Reset()
+{
+    SDL_GetMouseState(&this->mouse_aim_x, &this->mouse_aim_y);
+    this->shot_delay = 0;
+
+    this->x = 1.0f * (this->Display.GetWidth()  / 2);
+    this->y = 1.0f * (this->Display.GetHeight() / 2);
+
+    this->to_shoot = 1;
+    this->SHOT_DELAY = REGULAR_SHOT_DELAY;
+
+    this->lives             = 1;
 }
 
 void CPlayer::Kill()
@@ -84,9 +103,9 @@ void CPlayer::Blit()
         (*i)->duration--;
         if((*i)->duration == 0)
         {
-            if((*i)->ability == LOW_SHOT_DELAY)
+            if((*i)->ability == PowerUp::LOW_SHOT_DELAY)
                 SHOT_DELAY = REGULAR_SHOT_DELAY;
-            else if((*i)->ability == MORE_SHOTS)
+            else if((*i)->ability == PowerUp::MORE_SHOTS)
                 this->to_shoot -= this->to_shoot > 2 ? 2 : 0;
 
             delete (*i);
@@ -102,10 +121,10 @@ void CPlayer::Blit()
 
 void CPlayer::SetPowerUp(PowerUp* powerup)
 {
-    if(powerup->ability == LOW_SHOT_DELAY)
+    if(powerup->ability == PowerUp::LOW_SHOT_DELAY)
         SHOT_DELAY = LOWERED_SHOT_DELAY;
 
-    else if(powerup->ability == MORE_SHOTS)
+    else if(powerup->ability == PowerUp::MORE_SHOTS)
     {
         /* If we are already at the maximum amount of
          * shots that we can take, simply extend the
@@ -117,7 +136,7 @@ void CPlayer::SetPowerUp(PowerUp* powerup)
             for(std::list<PowerUp*>::iterator i = this->all_powerups.begin();
                 i != this->all_powerups.end(); i++)
             {
-                if((*i)->ability == MORE_SHOTS)
+                if((*i)->ability == PowerUp::MORE_SHOTS)
                 {
                     (*i)->duration += POWERUP_DURATION;
                     break;
@@ -131,9 +150,8 @@ void CPlayer::SetPowerUp(PowerUp* powerup)
         }
     }
 
-    else if(powerup->ability == EXTRA_LIFE)
+    else if(powerup->ability == PowerUp::EXTRA_LIFE)
         this->lives++;
 
-    this->current_powerup = powerup;
     this->all_powerups.push_back(powerup);
 }

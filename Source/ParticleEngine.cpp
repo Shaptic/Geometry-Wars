@@ -1,8 +1,8 @@
 #include "ParticleEngine.h"
 
-CBit::CBit(CDisplay& m_Screen, CTimer& m_timer, const int x, const int y,
-    const int m_dx, const int m_dy,
-    const int m_lifetime): CBaseObject(m_Screen, m_timer, x, y)
+CBit::CBit(CDisplay& m_Screen, CTimer& m_timer,
+    const int x, const int y, const int m_dx, const int m_dy,
+    const int m_lifetime): CBaseObject(m_Screen, m_timer, 1.0f * x, 1.0f * y)
 {
     this->dx = m_dx;
     this->dy = m_dy;
@@ -13,8 +13,9 @@ CBit::CBit(CDisplay& m_Screen, CTimer& m_timer, const int x, const int y,
     this->SetEntity(create_surface(5, 5, create_color(YELLOW)));
 }
 
-CBit::CBit(CDisplay& Screen, CTimer& timer, const int x, const int y, const int m_dx, const int m_dy, const SDL_Color& color):
-    CBaseObject(Screen, timer, x, y)
+CBit::CBit(CDisplay& Screen, CTimer& timer,
+    const int x, const int y, const int m_dx, const int m_dy,
+    const SDL_Color& color): CBaseObject(Screen, timer, 1.0f * x, 1.0f * y)
 {
     this->dx = m_dx;
     this->dy = m_dy;
@@ -24,9 +25,9 @@ CBit::CBit(CDisplay& Screen, CTimer& timer, const int x, const int y, const int 
     this->SetEntity(create_surface(5, 5, color));
 }
 
-CBit::CBit(CDisplay& Screen, CTimer& timer, const int x, const int y,
-    const int m_dx, const int m_dy,
-    const int m_lifetime, const SDL_Color& color): CBaseObject(Screen, timer, x, y)
+CBit::CBit(CDisplay& Screen, CTimer& timer,
+    const int x, const int y, const int m_dx, const int m_dy,
+    const int m_lifetime, const SDL_Color& color): CBaseObject(Screen, timer, 1.0f * x, 1.0f * y)
 {
     this->dx = m_dx;
     this->dy = m_dy;
@@ -38,8 +39,7 @@ CBit::CBit(CDisplay& Screen, CTimer& timer, const int x, const int y,
 }
 
 CBit::~CBit()
-{
-}
+{}
 
 void CBit::Update()
 {

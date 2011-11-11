@@ -1,8 +1,7 @@
 #include "Engine.h"
 
-Engine::Engine(): Screen(CDisplay(800, 600)), Fps(CTimer()),
-    EventHandler(CEvents()), MainMenu(CMenu(Screen, EventHandler)),
-    Levels(CLevelManager()), Particles(CParticleEngine(Screen, Fps)),
+Engine::Engine(): MainMenu(Screen, EventHandler),
+    Particles(Screen, Fps),
     Player(CPlayer(Screen, Fps))
 {
     this->Fps.SetFrameRate(60);
@@ -162,20 +161,19 @@ void Engine::NewGame()
     this->debug = false;
 #endif // _DEBUG
 
-    /* Restart levels
-    delete this->Levels;
-    this->Levels = new CLevelManager();
+    /* Restart levels */
+    this->Levels.Reset();
     
-    /* Renew player
-    delete this->Player;
-    this->Player = new CPlayer(this->Screen, this->Fps);
-
-    /* Renew particle engine
-    delete this->Particles;
-    this->Particles = new CParticleEngine(this->Screen, this->Fps);
-    */
+    /* Renew player */
+    this->Player.Reset();
 
     /* Remove all entities on the screen */
+    for(AllEnemies::iterator i = this->Enemies.begin(); i != this->Enemies.end(); i++)
+        delete (*i);
+
+    for(AllBullets::iterator i = this->Shots.begin(); i != this->Shots.end(); i++)
+        delete (*i);
+
     this->Enemies.clear();
     this->Shots.clear();
     this->enemy_iters.clear();
@@ -184,6 +182,9 @@ void Engine::NewGame()
     /* Move player to center, reset score */
     this->Player.Move_Force(this->Screen.GetWidth() / 2, this->Screen.GetHeight() / 2);
     this->score = 0;
+
+    this->quit = false;
+    this->play_again = true;
 
     this->Play();
 }
@@ -225,7 +226,7 @@ void Engine::Events()
             {
                 /* The "e" key forces an EMP explosion */
                 CEnemy emp(this->Screen, this->Fps, this->Player, "Data"FN_SLASH"Circle.png");
-                emp.SetPowerUp(EMP);
+                emp.SetPowerUp(PowerUp::EMP);
                 std::list<CEnemy*> tmp;
                 tmp.push_back(&emp);
                 this->DestroyEnemy(tmp.begin());
@@ -263,7 +264,7 @@ void Engine::CheckCollisions()
              * no matter what, but only die if 
              * debug mode is off
              */
-            if((*i)->GetPowerUp()->ability == EMP)
+            if((*i)->GetPowerUp()->ability == PowerUp::EMP)
             {
                 this->DestroyEnemy(i);
                 return;
@@ -272,17 +273,17 @@ void Engine::CheckCollisions()
             {
                 this->DestroyEnemy(i);
             }
-
-            if(!this->debug && this->Player.IsDead())
-            {
-                this->Particles.ExplodePlayer((int)this->Player.GetX(), (int)this->Player.GetY());
-
-                this->play_again = true;
-                this->quit = true;
-
-                return;
-            }
         }
+    }
+
+    if(!this->debug && this->Player.IsDead())
+    {
+        this->Particles.ExplodePlayer((int)this->Player.GetX(), (int)this->Player.GetY());
+
+        this->play_again = true;
+        this->quit = true;
+
+        return;
     }
 }
 
@@ -290,7 +291,7 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
 {
     static SDL_Surface* explosion = NULL;
 
-    if((*i)->GetPowerUp()->ability == EMP)
+    if((*i)->GetPowerUp()->ability == PowerUp::EMP)
     {
         /* EMP Destroys all enemies on the screen */
 

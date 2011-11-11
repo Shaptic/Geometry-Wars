@@ -28,6 +28,7 @@ public:
     CLevelManager(const std::string& filename);
     ~CLevelManager();
 
+    void Reset();
     bool CanSpawn(const int frame);
     void UpdateCurrentLevel(const int enemy_count);
     Level* GetCurrentLevel() const;

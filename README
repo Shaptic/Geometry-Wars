@@ -77,3 +77,7 @@ Changelog:
         - Global namespace has been cleaned up
         - One more enemy graphic added
         - Fixed a large memory leak
+        
+    Version 0.4.1 (11.11.11)
+        - Cleaned up code
+        - Restarting the game works better
