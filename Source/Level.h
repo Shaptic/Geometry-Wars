@@ -29,7 +29,7 @@ public:
     ~LevelManager();
 
     bool CanSpawn(const int frame);
-    void UpdateCurrentLevel(const int enemy_count);
+    int  UpdateCurrentLevel(const int enemy_count);
     Level* GetCurrentLevel() const;
 
 private:

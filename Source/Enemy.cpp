@@ -1,8 +1,9 @@
 #include "Enemy.h"
 
-Enemy::Enemy(Display* Screen, Timer* timer, CPlayer* Player): BaseObject(Screen, timer)
+Enemy::Enemy(Display* Screen, Timer* timer, CPlayer* Player,
+    const std::string& filename): BaseObject(Screen, timer)
 {
-    this->LoadEntity("Circle.png");
+    this->LoadEntity(filename.c_str());
 
     this->powerup = new PowerUp;
 
@@ -14,22 +15,45 @@ Enemy::Enemy(Display* Screen, Timer* timer, CPlayer* Player): BaseObject(Screen,
             this->powerup->duration = POWERUP_DURATION;
             this->powerup->ability  = SHIELD;
             break;
+
         case 1:
             this->powerup->duration = POWERUP_DURATION;
             this->powerup->ability  = MORE_SHOTS;
             break;
+
         case 2:
             this->powerup->duration = POWERUP_DURATION;
             this->powerup->ability  = LOW_SHOT_DELAY;
             break;
+
         case 3:
-            this->powerup->duration = 1;
-            this->powerup->ability  = EXTRA_LIFE;
+            /* Extra life has a 1/100 chance of spawning */
+            if(rand() % 10 == 6)
+            {
+                this->powerup->duration = 1;
+                this->powerup->ability  = EXTRA_LIFE;
+            }
+            else
+            {
+                this->powerup->duration = 1;
+                this->powerup->ability  = NO_POWERUP;
+            }
             break;
+
         case 4:
-            this->powerup->duration = 1;
-            this->powerup->ability  = EMP;
+            /* EMP has a 1/20 chance of spawning */
+            if(rand() % 2 == 1)
+            {
+                this->powerup->duration = 1;
+                this->powerup->ability  = EMP;
+            }
+            else
+            {
+                this->powerup->duration = 1;
+                this->powerup->ability  = NO_POWERUP;
+            }
             break;
+
         default:
             this->powerup->duration = 1;
             this->powerup->ability  = NO_POWERUP;

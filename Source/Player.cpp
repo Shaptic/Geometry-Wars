@@ -16,11 +16,17 @@ CPlayer::CPlayer(Display* Screen, Timer* timer): BaseObject(Screen, timer)
     this->to_shoot = 1;
 
     this->current_powerup   = NULL;
+    this->lives             = 1;
 }
 
 CPlayer::~CPlayer()
 {
     this->all_powerups.clear();
+}
+
+void CPlayer::Kill()
+{
+    this->lives--;
 }
 
 void CPlayer::Shoot(std::list<Bullet*>& shots)
@@ -64,6 +70,11 @@ bool CPlayer::CanShoot()
         return false;
 }
 
+bool CPlayer::IsDead()
+{
+    return (this->lives == 0);
+}
+
 void CPlayer::Blit()
 {
     /* Reduce the shot delay. */
@@ -97,8 +108,35 @@ void CPlayer::SetPowerUp(PowerUp* powerup)
 {
     if(powerup->ability == LOW_SHOT_DELAY)
         SHOT_DELAY = LOWERED_SHOT_DELAY;
-    else if(powerup->ability == MORE_SHOTS && this->to_shoot < MAX_SHOTS)
-        this->to_shoot += 2;
+
+    else if(powerup->ability == MORE_SHOTS)
+    {
+        /* If we are already at the maximum amount of
+         * shots that we can take, simply extend the
+         * amount of time that the increased shot
+         * count lasts.
+         */
+        if(this->to_shoot >= MAX_SHOTS)
+        {
+            for(std::list<PowerUp*>::iterator i = this->all_powerups.begin();
+                i != this->all_powerups.end(); i++)
+            {
+                if((*i)->ability == MORE_SHOTS)
+                {
+                    (*i)->duration += POWERUP_DURATION;
+                    break;
+                }
+            }
+            return;
+        }
+        else    // Otherwise just add 2 shots
+        {
+            this->to_shoot += 2;
+        }
+    }
+
+    else if(powerup->ability == EXTRA_LIFE)
+        this->lives++;
 
     this->current_powerup = powerup;
     this->all_powerups.push_back(powerup);

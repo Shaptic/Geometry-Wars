@@ -33,8 +33,10 @@ SDL_Surface* create_surface(const int w, const int h, const SDL_Color& color)
 
 SDL_Surface* create_surface_alpha(const int w, const int h)
 {
-    return SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA | SDL_RLEACCEL,
+    SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA | SDL_RLEACCEL,
                 w, h, 32, rmask, gmask, bmask, amask);
+
+    return tmp;
 }
 
 SDL_Surface* create_surface_alpha(const int w, const int h, const SDL_Color& color)

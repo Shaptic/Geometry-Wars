@@ -33,6 +33,7 @@ Engine::Engine()
 #endif // _DEBUG
 
     this->quit          = false;
+    this->play_again    = true;
     this->score         = 0;
     this->high_score    = 0;
 
@@ -102,7 +103,10 @@ void Engine::Play()
         this->Events();
 
         if(CheckQuit())
+        {
+            this->play_again = false;
             this->quit = true;
+        }
 
         if(IsDown(SDLK_UP) || IsDown(SDLK_w))
             dy = -PLAYER_SPEED;
@@ -139,6 +143,21 @@ void Engine::Play()
          * update the display.
          */
         this->UpdateAll();
+    }
+
+    frame = 0;
+
+    if(this->play_again)
+    {
+        while(frame < 60 * 2)
+        {
+            frame++;
+            this->UpdateAll();
+        }
+        if(MessageBoxA(NULL, "Game over! Do you want to play again?", "Play Again?", MB_YESNO) == IDYES)
+        {
+            this->NewGame();
+        }
     }
 }
 
@@ -203,6 +222,7 @@ void Engine::Events()
         if(evt.type == SDL_QUIT)
         {
             this->quit = true;
+            this->play_again = false;
             return;
         }
         else if(evt.type == SDL_KEYDOWN)
@@ -212,7 +232,7 @@ void Engine::Events()
             else if(evt.key.keysym.sym == SDLK_e && this->debug)
             {
                 /* The "e" key forces an EMP explosion */
-                Enemy emp(this->Screen, this->Fps, this->Player);
+                Enemy emp(this->Screen, this->Fps, this->Player, "Circle.png");
                 emp.SetPowerUp(EMP);
                 std::list<Enemy*> tmp;
                 tmp.push_back(&emp);
@@ -243,6 +263,9 @@ void Engine::CheckCollisions()
 
         if(this->Player->DetectCollision((*i)))
         {
+            if(!this->debug)
+                this->Player->Kill();
+
             /* We delete the enemy we collided with
              * no matter what, but only die if 
              * debug mode is off
@@ -253,14 +276,16 @@ void Engine::CheckCollisions()
                 return;
             }
             else
-                this->DestroyEnemy(i);
-
-            if(!this->debug)
             {
-                if(MessageBoxA(NULL, "You died! Do you want to play again?", "Play Again?", MB_YESNO) == IDYES)
-                    this->NewGame();
-                else
-                    this->quit = true;
+                this->DestroyEnemy(i);
+            }
+
+            if(!this->debug && this->Player->IsDead())
+            {
+                this->Particles->ExplodePlayer((int)this->Player->GetX(), (int)this->Player->GetY());
+
+                this->play_again = true;
+                this->quit = true;
 
                 return;
             }
@@ -270,6 +295,8 @@ void Engine::CheckCollisions()
 
 void Engine::DestroyEnemy(AllEnemies::iterator i)
 {
+    static SDL_Surface* explosion = NULL;
+
     if((*i)->GetPowerUp()->ability == EMP)
     {
         /* EMP Destroys all enemies on the screen */
@@ -336,7 +363,7 @@ void Engine::RemoveShots()
 
 void Engine::AddEnemy()
 {
-    Enemy* enemy = new Enemy(this->Screen, this->Fps, this->Player);
+    Enemy* enemy = new Enemy(this->Screen, this->Fps, this->Player, this->Levels->GetCurrentLevel()->enemy);
     this->Enemies.push_back(enemy);
 }
 
@@ -348,9 +375,9 @@ void Engine::ShowDebugInfo()
     static int x;
     static int y;
     static std::stringstream ss;
-    static SDL_Surface* mouse = NULL;
-    static SDL_Surface* player = NULL;
-    static TTF_Font* font = TTF_OpenFont("C:\\Windows\\Fonts\\Arial.ttf", 16);
+    static SDL_Surface* mouse   = NULL;
+    static SDL_Surface* player  = NULL;
+    static TTF_Font* font       = TTF_OpenFont("C:\\Windows\\Fonts\\Arial.ttf", 16);
 
     GetMousePosition(x, y);
 
@@ -366,13 +393,16 @@ void Engine::ShowDebugInfo()
         create_color(WHITE), CREATE_SURFACE | TRANSPARENT_BG);
 
     this->Screen->Blit(mouse, x, y);
-    this->Screen->Blit(player, (int)this->Player->GetX(), (int)this->Player->GetY());
+    this->Screen->Blit(player,
+        (int)this->Player->GetX() - this->Player->GetCollisionBoundaries()->w,
+        (int)this->Player->GetY() - this->Player->GetCollisionBoundaries()->h);
 
     SDL_FreeSurface(mouse);
     SDL_FreeSurface(player);
-    mouse = NULL;
-    player = NULL;
     ss.str(string());
+
+    mouse   = NULL;
+    player  = NULL;
 }
 
 void Engine::UpdateAll()
@@ -394,7 +424,8 @@ void Engine::UpdateAll()
      * do some AI, etc.
      */
     this->Screen->ClearScreen();
-    this->Player->Blit();
+    if(!this->Player->IsDead())
+        this->Player->Blit();
     this->Particles->UpdateParticles();
     this->ShowDebugInfo();
 
@@ -405,14 +436,25 @@ void Engine::UpdateAll()
     SDL_Surface* score_surf = render_text(this->main_font,
         ss.str(), NULL, create_color(WHITE), CREATE_SURFACE|TRANSPARENT_BG);
 
+    this->Screen->Blit(score_surf, 0, 0);
+
     ss.str(string());
     ss << "HIGHSCORE: " << this->high_score;
 
     SDL_Surface* hs_surf = render_text(this->main_font, ss.str(),
         NULL, create_color(WHITE), CREATE_SURFACE | TRANSPARENT_BG);
 
-    this->Screen->Blit(score_surf, 0, 0);
     this->Screen->Blit(hs_surf, this->Screen->width - get_text_width(this->main_font, ss.str()), 0);
+
+    ss.str(string());
+    ss << "Lives: " << this->Player->GetLives();
+
+    SDL_Surface* lives = render_text(this->main_font, ss.str(),
+        NULL, create_color(WHITE), CREATE_SURFACE | TRANSPARENT_BG);
+
+    this->Screen->Blit(lives,
+        this->Screen->width - get_text_width(this->main_font, ss.str()),
+        this->Screen->height - get_text_height(this->main_font, ss.str()));
 
     ss.str(string());
 

@@ -10,7 +10,7 @@ static const float ENEMY_SPEED = 2.5f;
 class Enemy: public BaseObject
 {
 public:
-    Enemy(Display* Screen, Timer* timer, CPlayer* Player);
+    Enemy(Display* Screen, Timer* timer, CPlayer* Player, const std::string& filename);
     ~Enemy();
 
     void Update();

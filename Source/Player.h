@@ -29,12 +29,16 @@ public:
     ~CPlayer();
 
     void Shoot(std::list<Bullet*>& bullets);
+    void Kill();
     bool CanShoot();
     bool CanDie();
+    bool IsDead();
+    int  GetLives(){return this->lives;}
     void Blit();
     void SetPowerUp(PowerUp* m_powerup);
 
 private:
+    unsigned int lives;
     unsigned int to_shoot;   // Amount of shots / burst
     unsigned int shot_delay; // Delay between bursts
     int mouse_aim_x, mouse_aim_y;   // Mouse location

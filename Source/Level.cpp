@@ -28,7 +28,7 @@ LevelManager::LevelManager()
          * Level file is organized like so:
          * NewLine
          * LEVEL:Level#
-         * ENEMY_TYPE:EnemyName
+         * ENEMY_TYPE:FileName
          * ENEMY_COUNT:#OfEnemies
          * SPAWN_DELAY:DelayBetweenEnemySpawns
          */
@@ -157,14 +157,20 @@ bool LevelManager::CanSpawn(const int frame)
     }
 }
 
-void LevelManager::UpdateCurrentLevel(const int enemy_count)
+int LevelManager::UpdateCurrentLevel(const int enemy_count)
 {
     if(enemy_count == 0)
-        return;
+        return 0;
 
     this->enemies_remaining -= enemy_count;
+
     if(this->enemies_remaining == 0)
+    {
         this->LoadNextLevel();
+        return 1;
+    }
+    else
+        return 0;
 }
 
 void LevelManager::LoadNextLevel()

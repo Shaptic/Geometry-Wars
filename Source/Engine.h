@@ -64,7 +64,10 @@ private:
 
     TTF_Font*       main_font;
 
-    bool            quit;
+    bool            quit;       // Quit the game
+    bool            play_again; // Is playing again a possibility?
+                                // Setting to false means no "Play Again?"
+                                // prompt after quit = true
     bool            debug;
 
     int             score;
