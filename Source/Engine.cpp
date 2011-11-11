@@ -229,6 +229,7 @@ void Engine::Events()
                 std::list<CEnemy*> tmp;
                 tmp.push_back(&emp);
                 this->DestroyEnemy(tmp.begin());
+                tmp.clear();
             }
         }
     }
@@ -487,5 +488,8 @@ void Engine::UpdateAll()
 
     /* Update the entire display */
     this->Screen.Update();
+
     SDL_FreeSurface(score_surf);
+    SDL_FreeSurface(hs_surf);
+    SDL_FreeSurface(lives);
 }

@@ -318,7 +318,6 @@ void CParticleEngine::UpdateParticles()
         this->show_emp_time--;
     }
     */
-
     remover1.clear();
     remover2.clear();
 }

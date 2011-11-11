@@ -483,14 +483,14 @@ int CMenu::AddGeneric(const char* text)
     this->buttons[LAST]->text       = new char[strlen(text) + 1];
     strncpy(this->buttons[LAST]->text, text, strlen(text) + 1);
 
-    this->buttons[LAST]->id         = this->buttons.size() + 69;
+    this->buttons[LAST]->id         = this->buttons.size() + ID_OFFSET;
     return this->buttons[LAST]->id;
 }
 
 int CMenu::Run()
 {
     int mouse_x, mouse_y;
-    int status = -1;
+    int status = 0;
 
     bool clicked;
 
@@ -515,9 +515,9 @@ int CMenu::Run()
         if(clicked)
             status = this->CheckClick(mouse_x, mouse_y);
         else
-            status = -1;
+            status = INVALID;
 
-        if(status != -1)
+        if(status != INVALID)
         {
             if(this->buttons[status]->btn_type == BTN_SUBMENU)
             {
@@ -620,7 +620,7 @@ int CMenu::Run()
     /* If we broke out of the while loop because quit was
      * true, we return -1, the ID to quit.
      */
-    return -2;
+    return QUIT_ID;
 }
 
 int CMenu::RunNoBlock(const int framesToRunFor)
@@ -653,9 +653,9 @@ int CMenu::RunNoBlock(const int framesToRunFor)
         if(clicked)
             status = this->CheckClick(mouse_x, mouse_y);
         else
-            status = -1;
+            status = INVALID;
 
-        if(status != -1)
+        if(status != INVALID)
         {
             if(this->buttons[status]->btn_type == BTN_SUBMENU)
             {
@@ -755,8 +755,5 @@ int CMenu::RunNoBlock(const int framesToRunFor)
         this->display.Update();
     }
 
-    /* If we broke out of the while loop because quit was
-     * true, we return -1, the ID to quit.
-     */
-    return -2;
+    return QUIT_ID;
 }

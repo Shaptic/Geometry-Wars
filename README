@@ -76,4 +76,4 @@ Changelog:
           rather than pointers.
         - Global namespace has been cleaned up
         - One more enemy graphic added
-        - TODO: Find and fix large memory leak
+        - Fixed a large memory leak

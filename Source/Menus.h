@@ -200,8 +200,10 @@ public:
     /* Default ID's for common game menu
      * options.
      */
-    static const signed short int QUIT_ID   = -2;
-    static const signed short int RETURN_ID = -1;
+    static const short ID_OFFSET        = 69;
+    static const signed short INVALID   = -1;
+    static const signed short QUIT_ID   = -2;
+    static const signed short RETURN_ID = -1;
 
 private:
     bool Initialize();
