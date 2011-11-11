@@ -21,8 +21,8 @@
 
 static const int PLAYER_SPEED   = 5;
 
-typedef std::list<Enemy*>                   AllEnemies;
-typedef std::list<Bullet*>                  AllBullets;
+typedef std::list<CEnemy*>                  AllEnemies;
+typedef std::list<CBullet*>                 AllBullets;
 typedef std::vector<AllEnemies::iterator>   EnemyIterator;
 typedef std::vector<AllBullets::iterator>   ShotIterator;
 
@@ -50,28 +50,29 @@ private:
     void ShowDebugInfo();
     void UpdateAll();
 
-    Display*        Screen;
-    CMenu*          MainMenu;
-    CPlayer*        Player;
-    AllEnemies      Enemies;
-    AllBullets      Shots;
-    LevelManager*   Levels;
-    ParticleEngine* Particles;
-    Timer*          Fps;
+    CDisplay            Screen;
+    CEvents             EventHandler;
+    CMenu               MainMenu;
+    CPlayer             Player;
+    AllEnemies          Enemies;
+    AllBullets          Shots;
+    CLevelManager       Levels;
+    CParticleEngine     Particles;
+    CTimer              Fps;
 
-    EnemyIterator   enemy_iters;
-    ShotIterator    shot_iters;
+    EnemyIterator       enemy_iters;
+    ShotIterator        shot_iters;
 
-    TTF_Font*       main_font;
+    TTF_Font*           main_font;
 
-    bool            quit;       // Quit the game
-    bool            play_again; // Is playing again a possibility?
+    bool                quit;       // Quit the game
+    bool                play_again; // Is playing again a possibility?
                                 // Setting to false means no "Play Again?"
                                 // prompt after quit = true
-    bool            debug;
+    bool                debug;
 
-    int             score;
-    int             high_score;
+    int                 score;
+    int                 high_score;
 };
 
 #endif // ENGINE_H

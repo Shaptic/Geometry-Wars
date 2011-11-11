@@ -1,7 +1,12 @@
 #include "Engine.h"
 
-Engine::Engine()
+Engine::Engine(): Screen(CDisplay(800, 600)), Fps(CTimer()),
+    EventHandler(CEvents()), MainMenu(CMenu(Screen, EventHandler)),
+    Levels(CLevelManager()), Particles(CParticleEngine(Screen, Fps)),
+    Player(CPlayer(Screen, Fps))
 {
+    this->Fps.SetFrameRate(60);
+
     srand((unsigned int)time(NULL));
 
     if(TTF_Init() != 0)
@@ -9,22 +14,13 @@ Engine::Engine()
 
     this->main_font     = TTF_OpenFont("C:\\Windows\\Fonts\\Arial.ttf", 24);
 
-    this->Screen        = new Display(800, 600);
-    this->MainMenu      = new CMenu(this->Screen);
-    this->Levels        = new LevelManager();
-    this->Fps           = new Timer();
-    this->Particles     = new ParticleEngine(this->Screen, this->Fps);
-
-    /* Set up the player image and limitations. */
-    this->Player        = new CPlayer(this->Screen, this->Fps);
-
     /* Set up our main menu */
-    this->MainMenu->SetFont(this->main_font);
-    this->MainMenu->SetStartCoordinates(this->Screen->width / 2, 200);
-    this->MainMenu->SetHighLightColor(WHITE);
-    this->MainMenu->AddMenuOption("GEOMETRY WARS!\nCreated by George Kudrayvtsev\n", BTN_TEXT, ACT_NONE);
-    this->MainMenu->AddMenuOption("Play Geometry Wars!", BTN_ACTION, ACT_PLAY);
-    this->MainMenu->AddMenuOption("Quit", BTN_ACTION, ACT_QUIT);
+    this->MainMenu.SetFont(this->main_font);
+    this->MainMenu.SetStartCoordinates(this->Screen.GetWidth() / 2, 200);
+    this->MainMenu.SetHighLightColor(WHITE);
+    this->MainMenu.AddMenuOption("GEOMETRY WARS!\nCreated by George Kudrayvtsev\n", BTN_TEXT, ACT_NONE);
+    this->MainMenu.AddMenuOption("Play Geometry Wars!", BTN_ACTION, ACT_PLAY);
+    this->MainMenu.AddMenuOption("Quit", BTN_ACTION, ACT_QUIT);
 
 #ifdef _DEBUG
     this->debug         = true;
@@ -42,11 +38,6 @@ Engine::Engine()
 
 Engine::~Engine()
 {
-    delete this->Screen;
-    delete this->MainMenu;
-    delete this->Fps;
-    delete this->Player;
-
     this->Enemies.clear();
     this->Shots.clear();
 
@@ -63,7 +54,7 @@ Engine::~Engine()
 
 void Engine::Menu()
 {
-    if(this->MainMenu->Run() == QUIT_ID)
+    if(this->MainMenu.Run() == CMenu::QUIT_ID)
         return;
     else
     {
@@ -92,12 +83,12 @@ void Engine::Play()
 
         frame++;
 
-        if(this->Levels->CanSpawn(frame))
+        if(this->Levels.CanSpawn(frame))
         {
             this->AddEnemy();
         }
 
-        this->Fps->Start();
+        this->Fps.Start();
 
         /* Handle our events */
         this->Events();
@@ -123,12 +114,12 @@ void Engine::Play()
             dx = 0;
 
         if(IsPressed(SDL_BUTTON_LEFT))
-            this->Player->Shoot(this->Shots);
+            this->Player.Shoot(this->Shots);
 
-        this->Particles->AddPlayerTrail(this->Player, dx, dy);
+        this->Particles.AddPlayerTrail(this->Player, dx, dy);
 
         /* Move player accordingly */
-        this->Player->Move_Rate(dx, dy);
+        this->Player.Move_Rate(dx, dy);
 
         /* Check collisions of bullets with enemies,
          * enemies with player, etc.
@@ -171,17 +162,18 @@ void Engine::NewGame()
     this->debug = false;
 #endif // _DEBUG
 
-    /* Restart levels */
+    /* Restart levels
     delete this->Levels;
-    this->Levels = new LevelManager();
+    this->Levels = new CLevelManager();
     
-    /* Renew player */
+    /* Renew player
     delete this->Player;
     this->Player = new CPlayer(this->Screen, this->Fps);
 
-    /* Renew particle engine */
+    /* Renew particle engine
     delete this->Particles;
-    this->Particles = new ParticleEngine(this->Screen, this->Fps);
+    this->Particles = new CParticleEngine(this->Screen, this->Fps);
+    */
 
     /* Remove all entities on the screen */
     this->Enemies.clear();
@@ -190,7 +182,7 @@ void Engine::NewGame()
     this->shot_iters.clear();
 
     /* Move player to center, reset score */
-    this->Player->Move_Force(this->Screen->width / 2, this->Screen->height / 2);
+    this->Player.Move_Force(this->Screen.GetWidth() / 2, this->Screen.GetHeight() / 2);
     this->score = 0;
 
     this->Play();
@@ -232,9 +224,9 @@ void Engine::Events()
             else if(evt.key.keysym.sym == SDLK_e && this->debug)
             {
                 /* The "e" key forces an EMP explosion */
-                Enemy emp(this->Screen, this->Fps, this->Player, "Circle.png");
+                CEnemy emp(this->Screen, this->Fps, this->Player, "Data"FN_SLASH"Circle.png");
                 emp.SetPowerUp(EMP);
-                std::list<Enemy*> tmp;
+                std::list<CEnemy*> tmp;
                 tmp.push_back(&emp);
                 this->DestroyEnemy(tmp.begin());
             }
@@ -261,10 +253,10 @@ void Engine::CheckCollisions()
             }
         }
 
-        if(this->Player->DetectCollision((*i)))
+        if(this->Player.DetectCollision((*i)))
         {
             if(!this->debug)
-                this->Player->Kill();
+                this->Player.Kill();
 
             /* We delete the enemy we collided with
              * no matter what, but only die if 
@@ -280,9 +272,9 @@ void Engine::CheckCollisions()
                 this->DestroyEnemy(i);
             }
 
-            if(!this->debug && this->Player->IsDead())
+            if(!this->debug && this->Player.IsDead())
             {
-                this->Particles->ExplodePlayer((int)this->Player->GetX(), (int)this->Player->GetY());
+                this->Particles.ExplodePlayer((int)this->Player.GetX(), (int)this->Player.GetY());
 
                 this->play_again = true;
                 this->quit = true;
@@ -302,7 +294,7 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
         /* EMP Destroys all enemies on the screen */
 
         /* First we update the level info */
-        this->Levels->UpdateCurrentLevel(Enemies.size());
+        this->Levels.UpdateCurrentLevel(Enemies.size());
 
         /* Then the score, 5 * all the enemies destroyed, but
          * only if it was used non-cheating.
@@ -318,7 +310,7 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
         for(AllEnemies::iterator j = this->Enemies.begin();
             j != this->Enemies.end(); j++)
         {
-            this->Particles->ExplodeObject((*j));
+            this->Particles.ExplodeObject((*j));
         }
 
         /* Then we remove the enemies */
@@ -328,7 +320,7 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
     else
     {
         /* Generate explosion */
-        this->Particles->ExplodeObject((*i));
+        this->Particles.ExplodeObject((*i));
 
         /* Increase score and add enemy for deletion */
         if(!this->debug)
@@ -343,7 +335,7 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
 
 void Engine::RemoveEnemies()
 {
-    this->Levels->UpdateCurrentLevel(this->enemy_iters.size());
+    this->Levels.UpdateCurrentLevel(this->enemy_iters.size());
 
     for(unsigned int i = 0; i < this->enemy_iters.size(); i++)
     {
@@ -363,7 +355,7 @@ void Engine::RemoveShots()
 
 void Engine::AddEnemy()
 {
-    Enemy* enemy = new Enemy(this->Screen, this->Fps, this->Player, this->Levels->GetCurrentLevel()->enemy);
+    CEnemy* enemy = new CEnemy(this->Screen, this->Fps, this->Player, this->Levels.GetCurrentLevel()->enemy);
     this->Enemies.push_back(enemy);
 }
 
@@ -387,15 +379,15 @@ void Engine::ShowDebugInfo()
         create_color(WHITE), CREATE_SURFACE | TRANSPARENT_BG);
 
     ss.str(string());
-    ss << "(" << this->Player->GetX() << ", " << this->Player->GetY() << ")";
+    ss << "(" << this->Player.GetX() << ", " << this->Player.GetY() << ")";
 
     player = render_text(font, ss.str(), NULL,
         create_color(WHITE), CREATE_SURFACE | TRANSPARENT_BG);
 
-    this->Screen->Blit(mouse, x, y);
-    this->Screen->Blit(player,
-        (int)this->Player->GetX() - this->Player->GetCollisionBoundaries()->w,
-        (int)this->Player->GetY() - this->Player->GetCollisionBoundaries()->h);
+    this->Screen.Blit(mouse, x, y);
+    this->Screen.Blit(player,
+        (int)this->Player.GetX() - this->Player.GetCollisionBoundaries()->w,
+        (int)this->Player.GetY() - this->Player.GetCollisionBoundaries()->h);
 
     SDL_FreeSurface(mouse);
     SDL_FreeSurface(player);
@@ -412,21 +404,21 @@ void Engine::UpdateAll()
      * sprite will move way way way offscreen, so we
      * must bring him back!
      */
-    if(this->Player->GetX() > this->Screen->width)
-        this->Player->Move_Force(this->Screen->width / 2, this->Screen->height / 2);
+    if(this->Player.GetX() > this->Screen.GetWidth())
+        this->Player.Move_Force(this->Screen.GetWidth() / 2, this->Screen.GetHeight() / 2);
 
-    if(this->Player->GetY() > this->Screen->height)
-        this->Player->Move_Force(this->Screen->width / 2, this->Screen->height / 2);
+    if(this->Player.GetY() > this->Screen.GetHeight())
+        this->Player.Move_Force(this->Screen.GetWidth() / 2, this->Screen.GetHeight() / 2);
 
     /* Now we clear the screen, update the player,
      * show some info if debugging, show score, 
      * delete off-screen sprites, update locations,
      * do some AI, etc.
      */
-    this->Screen->ClearScreen();
-    if(!this->Player->IsDead())
-        this->Player->Blit();
-    this->Particles->UpdateParticles();
+    this->Screen.ClearScreen();
+    if(!this->Player.IsDead())
+        this->Player.Blit();
+    this->Particles.UpdateParticles();
     this->ShowDebugInfo();
 
     /* Show the score on the screen */
@@ -436,7 +428,7 @@ void Engine::UpdateAll()
     SDL_Surface* score_surf = render_text(this->main_font,
         ss.str(), NULL, create_color(WHITE), CREATE_SURFACE|TRANSPARENT_BG);
 
-    this->Screen->Blit(score_surf, 0, 0);
+    this->Screen.Blit(score_surf, 0, 0);
 
     ss.str(string());
     ss << "HIGHSCORE: " << this->high_score;
@@ -444,17 +436,17 @@ void Engine::UpdateAll()
     SDL_Surface* hs_surf = render_text(this->main_font, ss.str(),
         NULL, create_color(WHITE), CREATE_SURFACE | TRANSPARENT_BG);
 
-    this->Screen->Blit(hs_surf, this->Screen->width - get_text_width(this->main_font, ss.str()), 0);
+    this->Screen.Blit(hs_surf, this->Screen.GetWidth() - get_text_width(this->main_font, ss.str()), 0);
 
     ss.str(string());
-    ss << "Lives: " << this->Player->GetLives();
+    ss << "Lives: " << this->Player.GetLives();
 
     SDL_Surface* lives = render_text(this->main_font, ss.str(),
         NULL, create_color(WHITE), CREATE_SURFACE | TRANSPARENT_BG);
 
-    this->Screen->Blit(lives,
-        this->Screen->width - get_text_width(this->main_font, ss.str()),
-        this->Screen->height - get_text_height(this->main_font, ss.str()));
+    this->Screen.Blit(lives,
+        this->Screen.GetWidth() - get_text_width(this->main_font, ss.str()),
+        this->Screen.GetHeight() - get_text_height(this->main_font, ss.str()));
 
     ss.str(string());
 
@@ -494,6 +486,6 @@ void Engine::UpdateAll()
     shots_to_remove.resize(0);
 
     /* Update the entire display */
-    this->Screen->Update();
+    this->Screen.Update();
     SDL_FreeSurface(score_surf);
 }

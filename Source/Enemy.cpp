@@ -1,7 +1,8 @@
 #include "Enemy.h"
 
-Enemy::Enemy(Display* Screen, Timer* timer, CPlayer* Player,
-    const std::string& filename): BaseObject(Screen, timer)
+CEnemy::CEnemy(CDisplay& Screen, CTimer& m_Timer, CPlayer& m_Player,
+    const std::string& filename): Player(m_Player), CBaseObject(Screen, m_Timer),
+    ENEMY_SPEED(2.5f)
 {
     this->LoadEntity(filename.c_str());
 
@@ -66,8 +67,6 @@ Enemy::Enemy(Display* Screen, Timer* timer, CPlayer* Player,
         this->powerup->ability = NO_POWERUP;
     }
 
-    this->Player    = Player;
-
     /* We must pick a random side offscreen to
      * spawn, top, bottom, left, right
      */
@@ -97,21 +96,21 @@ Enemy::Enemy(Display* Screen, Timer* timer, CPlayer* Player,
     }
 }
 
-Enemy::~Enemy()
+CEnemy::~CEnemy()
 {
-    this->Player->SetPowerUp(this->powerup);
+    this->Player.SetPowerUp(this->powerup);
 }
 
-void Enemy::Update()
+void CEnemy::Update()
 {
     float dx, dy;
 
-    if(this->Player->GetX() > this->GetX())
+    if(this->Player.GetX() > this->GetX())
         dx = ENEMY_SPEED;
     else
         dx = -ENEMY_SPEED;
 
-    if(this->Player->GetY() > this->GetY())
+    if(this->Player.GetY() > this->GetY())
         dy = ENEMY_SPEED;
     else
         dy = -ENEMY_SPEED;

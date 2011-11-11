@@ -1,23 +1,26 @@
 #ifndef POWER_UPS_H
 #define POWER_UPS_H
 
-static const int POWERUP_DURATION   = 600;    // 10 seconds-ish
-static const int TOTAL_POWERUPS     = 5;
-
-enum POWERUPS
+namespace PowerUps
 {
-    SHIELD,
-    MORE_SHOTS,
-    LOW_SHOT_DELAY,
-    EXTRA_LIFE,
-    EMP,
-    NO_POWERUP
-};
+    static const int POWERUP_DURATION   = 600;    // 10 seconds-ish
 
-struct PowerUp
-{
-    POWERUPS ability;
-    short duration;
-};
+    enum POWERUPS
+    {
+        SHIELD = -1,
+        MORE_SHOTS,
+        LOW_SHOT_DELAY,
+        EXTRA_LIFE,
+        EMP,
+        NO_POWERUP,
+        TOTAL_POWERUPS
+    };
+
+    struct PowerUp
+    {
+        POWERUPS ability;
+        short duration;
+    };
+}
 
 #endif // POWER_UPS_H

@@ -87,7 +87,7 @@ SDL_Surface* LoadImage_Alpha(const char* filename)
     }
 }
 
-Display::Display()
+CDisplay::CDisplay()
 {
     /* We didn't get any arguments,
      * so we use the default options.
@@ -103,7 +103,7 @@ Display::Display()
     this->Initialize();
 }
 
-Display::Display(const int width, const int height)
+CDisplay::CDisplay(const int width, const int height)
 {
     /* We only got height and width, so set those
      * accordingly, using defaults for the rest.
@@ -116,7 +116,7 @@ Display::Display(const int width, const int height)
     this->Initialize();
 }
 
-Display::Display(const int width, const int height,
+CDisplay::CDisplay(const int width, const int height,
             const int bpp, const int flags)
 {
     /* All custom parameters for the screen,
@@ -130,14 +130,14 @@ Display::Display(const int width, const int height,
     this->Initialize();
 }
 
-Display::~Display()
+CDisplay::~CDisplay()
 {
     SDL_FreeSurface(this->background);
     IMG_Quit();
     SDL_Quit();
 }
 
-void Display::Initialize()
+void CDisplay::Initialize()
 {
     /* Initialize the SDL library, and the
      * SDL_image library, showing error
@@ -183,7 +183,7 @@ void Display::Initialize()
 
     SDL_FillRect(this->background, NULL, 0x000000);}
 
-void Display::RenewDisplay()
+void CDisplay::RenewDisplay()
 {
     /* We create a new display with new parameters.
      * We do not need to call SDL_FreeSurface() on 
@@ -203,7 +203,7 @@ void Display::RenewDisplay()
         handleError(SDL_GetError());
 }
 
-void Display::RenewDisplay(const int width, const int height)
+void CDisplay::RenewDisplay(const int width, const int height)
 {
     /* Simply RenewDisplay() with custom parameters. */
     this->width     = width;
@@ -216,7 +216,7 @@ void Display::RenewDisplay(const int width, const int height)
         handleError(SDL_GetError());
 }
 
-void Display::RenewDisplay(const int width, const int height,
+void CDisplay::RenewDisplay(const int width, const int height,
             const int bpp, const int flags)
 {
     /* Simply RenewDisplay() with more custom parameters. */
@@ -232,7 +232,7 @@ void Display::RenewDisplay(const int width, const int height,
         handleError(SDL_GetError());
 }
 
-void Display::ClearScreen()
+void CDisplay::ClearScreen()
 {
     /* This will place a surface on the main
      * display, the all-black background we
@@ -241,7 +241,7 @@ void Display::ClearScreen()
     this->Blit(this->background, 0, 0);
 }
 
-void Display::ClearScreen(SDL_Surface* cleaner)
+void CDisplay::ClearScreen(SDL_Surface* cleaner)
 {
     /* Sometimes we don't want the background
      * to just be an all-black surface, so we
@@ -250,7 +250,7 @@ void Display::ClearScreen(SDL_Surface* cleaner)
     this->Blit(cleaner, 0, 0);
 }
 
-void Display::ToggleFullscreen()
+void CDisplay::ToggleFullscreen()
 {
     /* Pretty self-explanatory, we toggle the display
      * between windowed and fullscreen mode.
@@ -267,7 +267,7 @@ void Display::ToggleFullscreen()
     this->RenewDisplay(this->width, this->height, this->bpp, this->flags);
 }
 
-void Display::Blit(SDL_Surface* destination, SDL_Surface* source,
+void CDisplay::Blit(SDL_Surface* destination, SDL_Surface* source,
             const int x, const int y) const
 {
     /* Blitting is basically placing a surface on another
@@ -278,7 +278,7 @@ void Display::Blit(SDL_Surface* destination, SDL_Surface* source,
     SDL_BlitSurface(source, NULL, destination, &offset);
 }
 
-void Display::Blit(SDL_Surface* source, const int x,
+void CDisplay::Blit(SDL_Surface* source, const int x,
             const int y) const
 {
     /* This is a special case of blitting, where we
@@ -287,7 +287,7 @@ void Display::Blit(SDL_Surface* source, const int x,
     this->Blit(this->screen, source, x, y);
 }
 
-void Display::Update() const
+void CDisplay::Update() const
 {
     /* Update everything that we have blitted 
      * onto the main display surface.
@@ -295,19 +295,19 @@ void Display::Update() const
     SDL_Flip(this->screen);
 }
 
-SDL_Surface* Display::GetScreen() const
+SDL_Surface* CDisplay::GetScreen() const
 {
     /* Get our display. */
     return this->screen;
 }
 
-SDL_Surface* Display::GetBackground() const
+SDL_Surface* CDisplay::GetBackground() const
 {
     /* Get the background */
     return this->background;
 }
 
-Display* Display::GetDisplay()
+CDisplay* CDisplay::GetDisplay()
 {
     /* Get ourselves */
     return this;

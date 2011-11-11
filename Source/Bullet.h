@@ -5,14 +5,13 @@
 #include "Entity.h"
 
 static const double PI          = std::atan(1.0) * 4;
-static const float BULLET_SPEED = 10.0f;
 
-class Bullet : public BaseObject
+class CBullet : public CBaseObject
 {
 public:
-    Bullet(Display* Screen, Timer* timer, int x, int y);
-    Bullet(Display* Screen, Timer* timer, int x, int y, double angle);
-    ~Bullet();
+    CBullet(CDisplay& Screen, CTimer& timer, int x, int y);
+    CBullet(CDisplay& Screen, CTimer& timer, int x, int y, double angle);
+    ~CBullet();
 
     void Update();
 
@@ -20,6 +19,8 @@ private:
     int   dest_x, dest_y;
     float dx, dy;
     float unit_vector;
+
+    const float BULLET_SPEED;
 };
 
 #endif // BULLET_H

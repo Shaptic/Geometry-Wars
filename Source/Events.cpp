@@ -2,15 +2,15 @@
 
 using namespace std;
 
-Events::Events()
+CEvents::CEvents()
 {
 }
 
-Events::~Events()
+CEvents::~CEvents()
 {
 }
 
-void Events::HandleMenuEvents(bool& quit, int& mouseX,
+void CEvents::HandleMenuEvents(bool& quit, int& mouseX,
     int& mouseY, bool& clicked)
 {
     while(SDL_PollEvent(&this->event))
@@ -40,7 +40,7 @@ void Events::HandleMenuEvents(bool& quit, int& mouseX,
     clicked = false;
 }
 
-void Events::HandleQuit(bool* quit)
+void CEvents::HandleQuit(bool* quit)
 {
     while(SDL_PollEvent(&this->event))
     {

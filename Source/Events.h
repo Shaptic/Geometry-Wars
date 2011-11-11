@@ -9,11 +9,11 @@
  * use the functions rather than creating an Event
  * class for it.
  */
-class Events
+class CEvents
 {
 public:
-    Events();
-    ~Events();
+    CEvents();
+    ~CEvents();
 
     void    HandleMenuEvents(bool& quit, int& mouseX,
                 int& mouseY, bool& clicked);

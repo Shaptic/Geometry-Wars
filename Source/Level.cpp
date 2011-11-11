@@ -2,7 +2,7 @@
 
 using namespace std;
 
-LevelManager::LevelManager()
+CLevelManager::CLevelManager()
 {
     string tmp;
     ifstream file("LevelData.db");
@@ -67,7 +67,7 @@ LevelManager::LevelManager()
     this->spawned = 0;
 }
 
-LevelManager::LevelManager(const std::string& filename)
+CLevelManager::CLevelManager(const std::string& filename)
 {
     string tmp;
     ifstream file(filename);
@@ -130,7 +130,7 @@ LevelManager::LevelManager(const std::string& filename)
     this->CurrentLevel = this->Levels;
 }
 
-LevelManager::~LevelManager()
+CLevelManager::~CLevelManager()
 {
     for(Level* tmp = this->Levels; tmp != NULL; )
     {
@@ -140,7 +140,7 @@ LevelManager::~LevelManager()
     }
 }
 
-bool LevelManager::CanSpawn(const int frame)
+bool CLevelManager::CanSpawn(const int frame)
 {
     if(this->spawned >= this->CurrentLevel->enemy_count)
     {
@@ -157,23 +157,18 @@ bool LevelManager::CanSpawn(const int frame)
     }
 }
 
-int LevelManager::UpdateCurrentLevel(const int enemy_count)
+void CLevelManager::UpdateCurrentLevel(const int enemy_count)
 {
     if(enemy_count == 0)
-        return 0;
+        return;
 
     this->enemies_remaining -= enemy_count;
 
     if(this->enemies_remaining == 0)
-    {
         this->LoadNextLevel();
-        return 1;
-    }
-    else
-        return 0;
 }
 
-void LevelManager::LoadNextLevel()
+void CLevelManager::LoadNextLevel()
 {
     this->CurrentLevel = this->CurrentLevel->NextLevel;
     if(this->CurrentLevel == NULL)
@@ -183,7 +178,7 @@ void LevelManager::LoadNextLevel()
     this->enemies_remaining = this->CurrentLevel->enemy_count;
 }
 
-Level* LevelManager::GetCurrentLevel() const
+Level* CLevelManager::GetCurrentLevel() const
 {
     return this->CurrentLevel;
 }

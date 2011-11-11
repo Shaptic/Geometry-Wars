@@ -39,15 +39,6 @@
 #define FN_SLASH "/"
 #endif // WIN32
 
-/* Default flags for initialization of SDL,
- * as well as initializing the screen.
- */
-#define DEFAULT_SCREEN_WIDTH    800
-#define DEFAULT_SCREEN_HEIGHT   600
-#define DEFAULT_SCREEN_BPP      32
-#define DEFAULT_SCREEN_FLAGS    SDL_SWSURFACE
-#define DEFAULT_INIT_FLAGS      SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_TIMER
-
 /* This is the icon that will show up in
  * the application window. Set it to NULL
  * for no icon.
@@ -58,19 +49,6 @@
  * the title bar of your window.
  */
 #define WINDOW_CAPTION          "Geometry Wars"
-
-/* Quick macro to blit a surface onto the screen.
- * Though there is a function, it takes too long to
- * type display.Blit(surface, x, y).
- */
- #define BLIT(surface, x, y)    display->Blit(surface, x, y)
-
-/* Another few macros to easily get the screen size, provided
- * for backward-compatibility with older Display class, and 
- * for ease of use.
- */
-#define SCREEN_HEIGHT           display->height
-#define SCREEN_WIDTH            display->width
 
 /* Some retarded Windows stuff messes up function names
  * with ASCII / Unicode locales.
@@ -85,15 +63,15 @@ SDL_Surface* LoadImage(const char* filename);
 SDL_Surface* LoadImage_Alpha(const std::string& filename);
 SDL_Surface* LoadImage_Alpha(const char* filename);
 
-class Display
+class CDisplay
 {
 public:
-    Display();
-    Display(const int width, const int height);
-    Display(const int width, const int height,
+    CDisplay();
+    CDisplay(const int width, const int height);
+    CDisplay(const int width, const int height,
             const int bpp, const int flags);
 
-    ~Display();
+    ~CDisplay();
 
     /* We call this to re-create a display with
      * new parameters. Useful when switching to fullscreen,
@@ -126,10 +104,18 @@ public:
     /* Flip the display buffers, showing everything on screen. */
     void Update() const;
 
+    /* Get screen values */
+    int GetWidth(){return this->width;}
+    int GetHeight(){return this->height;}
+    SDL_Rect GetSize(){
+        SDL_Rect size = {0, 0, this->width, this->height};
+        return size;
+    }
+
     /* Get the screen, the background, and itself. */
     SDL_Surface* GetScreen() const;
     SDL_Surface* GetBackground() const;
-    Display*     GetDisplay();
+    CDisplay*    GetDisplay();
 
     /* Screen parameters */
     int width;
@@ -142,6 +128,15 @@ private:
      * and SDL_image, etc.
      */
     void Initialize();
+
+    /* Default flags for initialization of SDL,
+     * as well as initializing the screen.
+     */
+    static const int DEFAULT_SCREEN_WIDTH   = 800;
+    static const int DEFAULT_SCREEN_HEIGHT  = 600;
+    static const int DEFAULT_SCREEN_BPP     = 32;
+    static const int DEFAULT_SCREEN_FLAGS   = SDL_SWSURFACE;
+    static const int DEFAULT_INIT_FLAGS     = SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_TIMER;
 
     SDL_Surface* background;
     SDL_Surface* screen;

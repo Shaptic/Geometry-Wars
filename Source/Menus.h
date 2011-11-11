@@ -43,12 +43,6 @@
     #pragma comment(lib, "SDL_mixer.lib")
 #endif // _WIN32 || WIN32
 
-/* Default ID's for common game menu
- * options.
- */
-#define QUIT_ID     -2
-#define RETURN_ID   -1
-
 /* A handy little macro to access
  * the last element of the buttons
  * vector in the Menu class.
@@ -123,12 +117,10 @@ class CMenu
 {
 public:
     /* Overloaded constructor so the user can
-     * either choose to create a Display and Events
-     * member, or use a previously created one.
+     * use a previously created CEvents and CDisplay
+     * objects.
      */
-    CMenu();
-    CMenu(Display* display);
-    CMenu(Display* display, Events* eventHandler);
+    CMenu(CDisplay& display, CEvents& eventHandler);
 
     ~CMenu();
 
@@ -205,6 +197,12 @@ public:
     int  Run();
     int  RunNoBlock(const int framesToRunFor);
 
+    /* Default ID's for common game menu
+     * options.
+     */
+    static const signed short int QUIT_ID   = -2;
+    static const signed short int RETURN_ID = -1;
+
 private:
     bool Initialize();
     void CheckMouseOver(const int x, const int y);
@@ -220,8 +218,8 @@ private:
     int  AddText   (const char* text);
 
     /* Handling screen functions and events */
-    Display*        display;
-    Events*         eventHandler;
+    CDisplay&        display;
+    CEvents&         eventHandler;
 
     /* Menu background, text colors, menu font,
      * menu music, customized options, positions.

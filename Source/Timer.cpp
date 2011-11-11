@@ -1,29 +1,29 @@
 #include "Timer.h"
 
 
-Timer::Timer()
+CTimer::CTimer()
 {
     this->FRAME_RATE = 45;
     this->ticks = 0;
 }
 
-Timer::~Timer()
+CTimer::~CTimer()
 {
 }
 
-void Timer::Start()
+void CTimer::Start()
 {
     this->ticks = SDL_GetTicks();
 }
 
-float Timer::GetTicks()
+float CTimer::GetTicks()
 {
     Uint32 oldTicks = this->ticks;
     this->ticks = SDL_GetTicks();
     return 1.0f * (this->ticks - oldTicks);
 }
 
-void Timer::DelayFPS()
+void CTimer::DelayFPS()
 {
     if(((unsigned)this->GetTicks() < 1000 / this->FRAME_RATE))
     {

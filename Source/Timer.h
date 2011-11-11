@@ -3,20 +3,19 @@
 
 #include <SDL.h>
 
-class Timer
+class CTimer
 {
 public:
-    Timer();
-    ~Timer();
+    CTimer();
+    ~CTimer();
 
     void Start();
     float GetTicks();
     void SetFrameRate(const unsigned int newFrameRate){this->FRAME_RATE = newFrameRate;}
     void DelayFPS();
 
-    unsigned int FRAME_RATE;
-
 private:
+    unsigned int FRAME_RATE;
     int ticks;
 };
 

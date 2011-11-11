@@ -7,28 +7,15 @@
 #include "Bullet.h"
 #include "PowerUps.h"
 
-/* Between shots, in frames, not seconds */
-static const int REGULAR_SHOT_DELAY = 5;
-static const int LOWERED_SHOT_DELAY = 2;
-static int SHOT_DELAY               = REGULAR_SHOT_DELAY;
+using namespace PowerUps;
 
-/* The angle that each shot (not counting the first shot)
- * is fired at from the "barrel"
- */
-static const double SHOT_ANGLE = 10.0;
-
-/* The maximum amount of shots that can be fired 
- * in a single burst.
- */
-static const int MAX_SHOTS = 5;
-
-class CPlayer: public BaseObject
+class CPlayer: public CBaseObject
 {
 public:
-    CPlayer(Display* Screen, Timer* timer);
+    CPlayer(CDisplay& Screen, CTimer& timer);
     ~CPlayer();
 
-    void Shoot(std::list<Bullet*>& bullets);
+    void Shoot(std::list<CBullet*>& bullets);
     void Kill();
     bool CanShoot();
     bool CanDie();
@@ -38,6 +25,22 @@ public:
     void SetPowerUp(PowerUp* m_powerup);
 
 private:
+    /* Between shots, in frames, not seconds */
+    static const int REGULAR_SHOT_DELAY = 5;
+    static const int LOWERED_SHOT_DELAY = 2;
+    
+    int SHOT_DELAY;
+
+    /* The angle that each shot (not counting the first shot)
+     * is fired at from the "barrel"
+     */
+    static const int SHOT_ANGLE = 5;
+
+    /* The maximum amount of shots that can be fired 
+     * in a single burst.
+     */
+    static const int MAX_SHOTS = 5;
+
     unsigned int lives;
     unsigned int to_shoot;   // Amount of shots / burst
     unsigned int shot_delay; // Delay between bursts

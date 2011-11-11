@@ -70,3 +70,10 @@ Changelog:
         - Fixed a bug where sometimes the player would die, turning
           invisible for a few seconds, then being visible again, and
           invincible as well, because the life count dropped below 0
+          
+    Version 0.4.0 (11.11.11)
+        - Re-wrote every single class to use references to objects
+          rather than pointers.
+        - Global namespace has been cleaned up
+        - One more enemy graphic added
+        - TODO: Find and fix large memory leak

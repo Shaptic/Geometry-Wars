@@ -8,7 +8,7 @@
 #include "SDL_Helper.h"
 #include "Timer.h"
 
-class BaseObject
+class CBaseObject
 {
     /* A base object class with various functionality
      * such as loading an image, setting up surfaces,
@@ -16,10 +16,9 @@ class BaseObject
      */
 
 public:
-    BaseObject(Display* display, Timer* timer);
-    BaseObject(Display* display, Timer* timer, const int x, const int y);
-    BaseObject(Display* display, Timer* timer, const float x, const float y);
-    virtual ~BaseObject();
+    CBaseObject(CDisplay& display, CTimer& timer);
+    CBaseObject(CDisplay& display, CTimer& timer, const float x, const float y);
+    virtual ~CBaseObject();
 
     /* Load or set a surface as the image for the object,
      * and clean it up whenever you want.
@@ -60,7 +59,7 @@ public:
     void SetCollisionBoundaries(const SDL_Rect* boundaries);
 
     /* Detect a collision with another object in the game world */
-    bool DetectCollision(BaseObject* obj) const;
+    bool DetectCollision(CBaseObject* obj) const;
     bool DetectCollision(const SDL_Rect& rect) const;
     bool DetectCollision(const SDL_Rect* rect) const;
 
@@ -80,8 +79,9 @@ public:
     const SDL_Rect*    GetCollisionBoundaries() const;
 
 protected:
-    Display*        display;
-    Timer*          timer;
+    CDisplay&       Display;
+    CTimer&         Timer;
+
     SDL_Surface*    main_entity;
     SDL_Rect        collision_box;
 

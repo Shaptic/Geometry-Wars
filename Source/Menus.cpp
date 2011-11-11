@@ -3,27 +3,8 @@
 
 using std::string;
 
-CMenu::CMenu()
+CMenu::CMenu(CDisplay& m_display, CEvents& m_eventHandler): display(m_display), eventHandler(m_eventHandler)
 {
-    this->display       = new Display();
-    this->eventHandler  = new Events();
-
-    this->Initialize();
-}
-
-CMenu::CMenu(Display* display)
-{
-    this->display       = display;
-    this->eventHandler  = new Events();
-
-    this->Initialize();
-}
-
-CMenu::CMenu(Display* display, Events* eventHandler)
-{
-    this->display       = display;
-    this->eventHandler  = eventHandler;
-
     this->Initialize();
 }
 
@@ -56,14 +37,14 @@ bool CMenu::Initialize()
     this->font      = NULL;
 #endif // _WIN32 || WIN32
 
-    this->bg        = create_surface(SCREEN_WIDTH, SCREEN_HEIGHT, create_color(BLACK));
+    this->bg        = create_surface(this->display.GetWidth(), this->display.GetWidth(), create_color(BLACK));
     this->music     = NULL;
     this->txtColor  = create_color(WHITE);
     this->txtColor  = create_color(GREEN);
     this->offset    = get_text_height(this->font, "TEST");
     this->quit      = false;
     this->SetCenterText(true);
-    this->SetStartCoordinates(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    this->SetStartCoordinates(this->display.GetWidth() / 2, this->display.GetWidth() / 2);
 
     return true;
 }
@@ -141,8 +122,8 @@ void CMenu::SetStartCoordinates(const int x, const int y)
 
 void CMenu::SetStartCoordinatesInScreenCenter()
 {
-    this->x = SCREEN_WIDTH / 2;
-    this->y = SCREEN_HEIGHT / 2;
+    this->x = this->display.GetWidth() / 2;
+    this->y = this->display.GetHeight() / 2;
 }
 
 void CMenu::SetCenterText(bool toggle)
@@ -244,7 +225,7 @@ int CMenu::AddAction(const char* text, ACTION_TYPE act)
             this->font, (string)text, NULL, this->hlColor,
             ALIGN_CENTER | TRANSPARENT_BG | CREATE_SURFACE);
 
-        this->buttons[LAST]->x = ((SCREEN_WIDTH / 2) - 
+        this->buttons[LAST]->x = ((this->display.GetWidth() / 2) - 
             (this->buttons[LAST]->normal->clip_rect.w / 2));
 
         this->offset = this->buttons[LAST]->normal->clip_rect.h;
@@ -307,7 +288,7 @@ int CMenu::AddToggle(const char* text, bool on)
             this->font, (string)text, NULL, this->hlColor,
             ALIGN_CENTER | TRANSPARENT_BG | CREATE_SURFACE);
 
-        this->buttons[LAST]->x = ((SCREEN_WIDTH / 2) - 
+        this->buttons[LAST]->x = ((this->display.GetWidth() / 2) - 
             (this->buttons[LAST]->normal->clip_rect.w / 2));
 
         this->offset = this->buttons[LAST]->normal->clip_rect.h;
@@ -362,7 +343,7 @@ int CMenu::AddSubMenu(const char* text, CMenu* nextMenu)
             this->font, (string)text, NULL, this->hlColor,
             ALIGN_CENTER | TRANSPARENT_BG | CREATE_SURFACE);
 
-        this->buttons[LAST]->x = ((SCREEN_WIDTH / 2) - 
+        this->buttons[LAST]->x = ((this->display.GetWidth() / 2) - 
             (this->buttons[LAST]->normal->clip_rect.w / 2));
 
         this->offset = this->buttons[LAST]->normal->clip_rect.h;
@@ -416,7 +397,7 @@ int CMenu::AddText(const char* text)
 
         this->buttons[LAST]->highlight = NULL;
 
-        this->buttons[LAST]->x = ((SCREEN_WIDTH / 2) - 
+        this->buttons[LAST]->x = ((this->display.GetWidth() / 2) - 
             (this->buttons[LAST]->normal->clip_rect.w / 2));
 
         this->offset = this->buttons[LAST]->normal->clip_rect.h;
@@ -469,7 +450,7 @@ int CMenu::AddGeneric(const char* text)
             this->font, (string)text, NULL, this->hlColor,
             ALIGN_CENTER | TRANSPARENT_BG | CREATE_SURFACE);
 
-        this->buttons[LAST]->x = ((SCREEN_WIDTH / 2) - 
+        this->buttons[LAST]->x = ((this->display.GetWidth() / 2) - 
             (this->buttons[LAST]->normal->clip_rect.w / 2));
 
         this->offset = this->buttons[LAST]->normal->clip_rect.h;
@@ -525,7 +506,7 @@ int CMenu::Run()
 
     while(!this->quit)
     {
-        this->eventHandler->HandleMenuEvents(this->quit,
+        this->eventHandler.HandleMenuEvents(this->quit,
                 mouse_x, mouse_y, clicked);
 
         this->CheckMouseOver(mouse_x, mouse_y);
@@ -576,7 +557,7 @@ int CMenu::Run()
                         this->font, tmp, NULL, this->hlColor,
                         ALIGN_CENTER | TRANSPARENT_BG | CREATE_SURFACE);
 
-                    this->buttons[status]->x = ((SCREEN_WIDTH / 2) - 
+                    this->buttons[status]->x = ((this->display.GetWidth() / 2) - 
                         (this->buttons[status]->normal->clip_rect.w / 2));
                 }
 
@@ -622,18 +603,18 @@ int CMenu::Run()
             }
         }
 
-        BLIT(this->bg, 0, 0);
+        this->display.Blit(this->bg, 0, 0);
 
-        /* Display each menu option */
+        /* CDisplay each menu option */
         for(unsigned int i=0; i < this->buttons.size(); i++)
         {
-            BLIT(this->buttons[i]->main,
+            this->display.Blit(this->buttons[i]->main,
                 this->buttons[i]->x, 
                 this->buttons[i]->y);
         }
 
         /* Update the screen */
-        this->display->Update();
+        this->display.Update();
     }
 
     /* If we broke out of the while loop because quit was
@@ -663,7 +644,7 @@ int CMenu::RunNoBlock(const int framesToRunFor)
     while(!this->quit && count < framesToRunFor)
     {
         count++;
-        this->eventHandler->HandleMenuEvents(this->quit,
+        this->eventHandler.HandleMenuEvents(this->quit,
                 mouse_x, mouse_y, clicked);
 
         this->CheckMouseOver(mouse_x, mouse_y);
@@ -714,7 +695,7 @@ int CMenu::RunNoBlock(const int framesToRunFor)
                         this->font, tmp, NULL, this->hlColor,
                         ALIGN_CENTER | TRANSPARENT_BG | CREATE_SURFACE);
 
-                    this->buttons[status]->x = ((SCREEN_WIDTH / 2) - 
+                    this->buttons[status]->x = ((this->display.GetWidth() / 2) - 
                         (this->buttons[status]->normal->clip_rect.w / 2));
                 }
 
@@ -760,18 +741,18 @@ int CMenu::RunNoBlock(const int framesToRunFor)
             }
         }
 
-        BLIT(this->bg, 0, 0);
+        this->display.Blit(this->bg, 0, 0);
 
-        /* Display each menu option */
+        /* CDisplay each menu option */
         for(unsigned int i=0; i < this->buttons.size(); i++)
         {
-            BLIT(this->buttons[i]->main,
+            this->display.Blit(this->buttons[i]->main,
                 this->buttons[i]->x, 
                 this->buttons[i]->y);
         }
 
         /* Update the screen */
-        this->display->Update();
+        this->display.Update();
     }
 
     /* If we broke out of the while loop because quit was

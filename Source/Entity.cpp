@@ -1,54 +1,24 @@
 #include "Entity.h"
 
-BaseObject::BaseObject(Display* display, Timer* timer)
+CBaseObject::CBaseObject(CDisplay& display, CTimer& timer):
+    Display(display), Timer(timer), x(0.0f), y(0.0f), max_x(INT_MAX),
+        max_y(INT_MAX), min_x(INT_MIN), min_y(INT_MIN)
 {
     /* Set member values, including location,
      * boundaries, and the display class.
      */
-    this->display   = display;
-    this->timer     = timer;
-    this->x         = 0.0f;
-    this->y         = 0.0f;
-
-    this->max_x     = INT_MAX;
-    this->max_y     = INT_MAX;
-    this->min_x     = INT_MIN;
-    this->min_y     = INT_MIN;
 }
 
-BaseObject::BaseObject(Display* display, Timer* timer, const int x, const int y)
+CBaseObject::CBaseObject(CDisplay& display, CTimer& timer, const float m_x, const float m_y):
+    Display(display), Timer(timer), x(m_x), y(m_y), max_x(INT_MAX),
+        max_y(INT_MAX), min_x(INT_MIN), min_y(INT_MIN)
 {
     /* Set member values, including location,
      * boundaries, and the display class.
      */
-    this->display   = display;
-    this->timer     = timer;
-    this->x         = x * 1.0f;
-    this->y         = y * 1.0f;
-
-    this->max_x     = INT_MAX;
-    this->max_y     = INT_MAX;
-    this->min_x     = INT_MIN;
-    this->min_y     = INT_MIN;
 }
 
-BaseObject::BaseObject(Display* display, Timer* timer, const float x, const float y)
-{
-    /* Set member values, including location,
-     * boundaries, and the display class.
-     */
-    this->display   = display;
-    this->timer     = timer;
-    this->x         = x;
-    this->y         = y;
-
-    this->max_x     = INT_MAX;
-    this->max_y     = INT_MAX;
-    this->min_x     = INT_MIN;
-    this->min_y     = INT_MIN;
-}
-
-BaseObject::~BaseObject()
+CBaseObject::~CBaseObject()
 {
     /* Class destructor (virtual) will
      * free the entity if it isn't free
@@ -58,7 +28,7 @@ BaseObject::~BaseObject()
         SDL_FreeSurface(this->main_entity);
 }
 
-void BaseObject::SetEntity(SDL_Surface* entity)
+void CBaseObject::SetEntity(SDL_Surface* entity)
 {
     /* Here we can set the entity to a surface,
      * be it an image, or custom shape, we previously
@@ -79,10 +49,10 @@ void BaseObject::SetEntity(SDL_Surface* entity)
         this->main_entity->clip_rect.h));
 }
 
-void BaseObject::LoadEntity(const char* filename)
+void CBaseObject::LoadEntity(const char* filename)
 {
     /* Here we can load an image using the LoadImage()
-     * function found in Display.h.
+     * function found in CDisplay.h.
      */
     this->main_entity = LoadImage_Alpha(filename);
 
@@ -99,7 +69,7 @@ void BaseObject::LoadEntity(const char* filename)
         this->main_entity->clip_rect.h));
 }
 
-void BaseObject::FreeEntity()
+void CBaseObject::FreeEntity()
 {
     /* Once we are done using the SDL_Surface*,
      * we need to free memory. Remember, when you
@@ -112,7 +82,7 @@ void BaseObject::FreeEntity()
     }
 }
 
-void BaseObject::FillRect(const int x, const int y, const int w, const int h,
+void CBaseObject::FillRect(const int x, const int y, const int w, const int h,
             const SDL_Color& fill_color)
 {
     /* This will fill a portion of the main entity
@@ -122,13 +92,13 @@ void BaseObject::FillRect(const int x, const int y, const int w, const int h,
         fill_rect(this->main_entity, create_rect(x, y, w, h), fill_color);
 }
 
-void BaseObject::FillRect(const SDL_Rect& rect, const SDL_Color& fill_color)
+void CBaseObject::FillRect(const SDL_Rect& rect, const SDL_Color& fill_color)
 {
-    /* Same as other BaseObject::FillRect() */
+    /* Same as other CBaseObject::FillRect() */
     fill_rect(this->main_entity, (SDL_Rect)rect, fill_color);
 }
 
-void BaseObject::Move(const int x, const int y, float delta)
+void CBaseObject::Move(const int x, const int y, float delta)
 {
     /* Move the entity to a certain location
      * in the game world.
@@ -136,7 +106,7 @@ void BaseObject::Move(const int x, const int y, float delta)
     this->Move(x * 1.0f, y * 1.0f, delta);
 }
 
-void BaseObject::Move(const float x, const float y, float delta)
+void CBaseObject::Move(const float x, const float y, float delta)
 {
     /* Move the entity to a certain location
      * in the game world.
@@ -169,26 +139,26 @@ void BaseObject::Move(const float x, const float y, float delta)
     this->collision_box.y = (int)y;
 }
 
-void BaseObject::Move_Rate(const int dx, const int dy)
+void CBaseObject::Move_Rate(const int dx, const int dy)
 {
     /* Rather than moving directly to an (x, y) coordinate,
      * we can move it in a certain direction with a certain
      * speed.
      */
-    this->Move(this->GetX() + dx, this->GetY() + dy, this->timer->GetTicks());
+    this->Move(this->GetX() + dx, this->GetY() + dy, this->Timer.GetTicks());
 }
 
-void BaseObject::Move_Rate(const float dx, const float dy)
+void CBaseObject::Move_Rate(const float dx, const float dy)
 {
     /* Rather than moving directly to an (x, y) coordinate,
      * we can move it in a certain direction with a certain
      * speed.
      */
-    this->Move(this->GetX() + dx, this->GetY() + dy, this->timer->GetTicks());
+    this->Move(this->GetX() + dx, this->GetY() + dy, this->Timer.GetTicks());
 }
 
 
-void BaseObject::Move_Force(const int x, const int y)
+void CBaseObject::Move_Force(const int x, const int y)
 {
     /* Move the entity to a certain location
      * in the game world.
@@ -196,7 +166,7 @@ void BaseObject::Move_Force(const int x, const int y)
     this->Move_Force(x * 1.0f, y * 1.0f);
 }
 
-void BaseObject::Move_Force(const float x, const float y)
+void CBaseObject::Move_Force(const float x, const float y)
 {
     /* Force the entity to a certain location
      * in the game world.
@@ -209,14 +179,14 @@ void BaseObject::Move_Force(const float x, const float y)
 }
 
 
-void BaseObject::Blit()
+void CBaseObject::Blit()
 {
     /* Update the entity on the screen. */
     if(this->main_entity != NULL)
-        this->display->Blit(this->main_entity, (int)this->x, (int)this->y);
+        this->Display.Blit(this->main_entity, (int)this->x, (int)this->y);
 }
 
-void BaseObject::SetCollisionBoundaries(const int x, const int y,
+void CBaseObject::SetCollisionBoundaries(const int x, const int y,
         const int w, const int h)
 {
     /* Set up collision boundaries. This really
@@ -229,13 +199,13 @@ void BaseObject::SetCollisionBoundaries(const int x, const int y,
     this->collision_box.h = h;
 }
 
-void BaseObject::SetCollisionBoundaries(const SDL_Rect& boundaries)
+void CBaseObject::SetCollisionBoundaries(const SDL_Rect& boundaries)
 {
     /* Overloaded method. */
     this->collision_box = boundaries;
 }
 
-void BaseObject::SetCollisionBoundaries(const SDL_Rect* boundaries)
+void CBaseObject::SetCollisionBoundaries(const SDL_Rect* boundaries)
 {
     /* Overloaded again. */
     this->collision_box.x = boundaries->x;
@@ -244,7 +214,7 @@ void BaseObject::SetCollisionBoundaries(const SDL_Rect* boundaries)
     this->collision_box.h = boundaries->h;
 }
 
-bool BaseObject::DetectCollision(BaseObject* obj) const
+bool CBaseObject::DetectCollision(CBaseObject* obj) const
 {
     /* Detect whether or not our entity has collided
      * with another entity.
@@ -252,7 +222,7 @@ bool BaseObject::DetectCollision(BaseObject* obj) const
     return detect_collision(this->GetCollisionBoundaries(), obj->GetCollisionBoundaries());
 }
 
-bool BaseObject::DetectCollision(const SDL_Rect& rect) const
+bool CBaseObject::DetectCollision(const SDL_Rect& rect) const
 {
     /* Detect whether or not our entity has collided
      * with a rectangle representing a place in the game
@@ -261,20 +231,20 @@ bool BaseObject::DetectCollision(const SDL_Rect& rect) const
     return detect_collision(this->GetCollisionBoundaries(), &rect);
 }
 
-bool BaseObject::DetectCollision(const SDL_Rect* rect) const
+bool CBaseObject::DetectCollision(const SDL_Rect* rect) const
 {
     /* Overloaded for an SDL_Rect*. */
     return detect_collision(this->GetCollisionBoundaries(), rect);
 }
 
-void BaseObject::SetMovementBoundaries_Max(const int x, const int y)
+void CBaseObject::SetMovementBoundaries_Max(const int x, const int y)
 {
     /* Set maximum movement boundaries */
     this->max_x = x;
     this->max_y = y;
 }
 
-void BaseObject::SetMovementBoundaries_Min(const int x, const int y)
+void CBaseObject::SetMovementBoundaries_Min(const int x, const int y)
 {
     /* Set minimum movement boundaries */
     this->min_x = x;
@@ -285,22 +255,22 @@ void BaseObject::SetMovementBoundaries_Min(const int x, const int y)
  * retrieve information about our entity.
  */
 
-float BaseObject::GetX() const
+float CBaseObject::GetX() const
 {
     return this->x;
 }
 
-float BaseObject::GetY() const
+float CBaseObject::GetY() const
 {
     return this->y;
 }
 
-SDL_Surface* BaseObject::GetEntity() const
+SDL_Surface* CBaseObject::GetEntity() const
 {
     return this->main_entity;
 }
 
-const SDL_Rect* BaseObject::GetCollisionBoundaries() const
+const SDL_Rect* CBaseObject::GetCollisionBoundaries() const
 {
     return &this->collision_box;
 }

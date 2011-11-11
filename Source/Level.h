@@ -21,15 +21,15 @@ struct Level
     Level* NextLevel;
 };
 
-class LevelManager
+class CLevelManager
 {
 public:
-    LevelManager();
-    LevelManager(const std::string& filename);
-    ~LevelManager();
+    CLevelManager();
+    CLevelManager(const std::string& filename);
+    ~CLevelManager();
 
     bool CanSpawn(const int frame);
-    int  UpdateCurrentLevel(const int enemy_count);
+    void UpdateCurrentLevel(const int enemy_count);
     Level* GetCurrentLevel() const;
 
 private:

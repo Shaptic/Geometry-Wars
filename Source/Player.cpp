@@ -1,6 +1,6 @@
 #include "Player.h"
 
-CPlayer::CPlayer(Display* Screen, Timer* timer): BaseObject(Screen, timer)
+CPlayer::CPlayer(CDisplay& Screen, CTimer& timer): CBaseObject(Screen, timer)
 {
     this->SetEntity(create_surface(20, 20, create_color(GREEN)));
     this->SetCollisionBoundaries(create_rect(0, 0, 20, 20));
@@ -10,10 +10,11 @@ CPlayer::CPlayer(Display* Screen, Timer* timer): BaseObject(Screen, timer)
     SDL_GetMouseState(&this->mouse_aim_x, &this->mouse_aim_y);
     this->shot_delay = 0;
 
-    this->x = 1.0f * (Screen->width / 2);
-    this->y = 1.0f * (Screen->height / 2);
+    this->x = 1.0f * (Screen.GetWidth()  / 2);
+    this->y = 1.0f * (Screen.GetHeight() / 2);
 
     this->to_shoot = 1;
+    this->SHOT_DELAY = REGULAR_SHOT_DELAY;
 
     this->current_powerup   = NULL;
     this->lives             = 1;
@@ -29,26 +30,28 @@ void CPlayer::Kill()
     this->lives--;
 }
 
-void CPlayer::Shoot(std::list<Bullet*>& shots)
+void CPlayer::Shoot(std::list<CBullet*>& shots)
 {
     if(!this->CanShoot())
         return;
+    else
+        this->shot_delay = SHOT_DELAY;
 
     /* We need to calculate the slope that the bullet needs
      * to have in order to be going in the direction of the 
      * mouse pointer.
      */
-    double angle_iter = SHOT_ANGLE;
+    double angle_iter = 1.0 * SHOT_ANGLE;
 
-    for(short i = 0; i <= this->to_shoot; i++)
+    for(unsigned short i = 0; i < this->to_shoot; i++)
     {
         if(i % 2 == 0)
-            angle_iter = -(i/2) * SHOT_ANGLE;
+            angle_iter = -(i/2.0) * SHOT_ANGLE;
         else
-            angle_iter = (i/2) * SHOT_ANGLE;
+            angle_iter = (i/2.0) * SHOT_ANGLE;
 
-        Bullet* shot = new Bullet(
-            this->display, this->timer,
+        CBullet* shot = new CBullet(
+            this->Display, this->Timer,
             (int)this->x + (this->collision_box.w / 2) - 5,
             (int)this->y + (this->collision_box.h / 2) - 5,
             angle_iter);
@@ -60,14 +63,7 @@ void CPlayer::Shoot(std::list<Bullet*>& shots)
 
 bool CPlayer::CanShoot()
 {
-    if(this->shot_delay == 0)
-    {
-        this->shot_delay = SHOT_DELAY;
-        return true;
-    }
-
-    else
-        return false;
+    return (this->shot_delay == 0);
 }
 
 bool CPlayer::IsDead()
@@ -101,7 +97,7 @@ void CPlayer::Blit()
 
     /* Update the entity on the screen. */
     if(this->main_entity != NULL)
-        this->display->Blit(this->main_entity, (int)this->x, (int)this->y);
+        this->Display.Blit(this->main_entity, (int)this->x, (int)this->y);
 }
 
 void CPlayer::SetPowerUp(PowerUp* powerup)

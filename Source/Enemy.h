@@ -5,13 +5,13 @@
 #include "Player.h"
 #include "PowerUps.h"
 
-static const float ENEMY_SPEED = 2.5f;
+using namespace PowerUps;
 
-class Enemy: public BaseObject
+class CEnemy: public CBaseObject
 {
 public:
-    Enemy(Display* Screen, Timer* timer, CPlayer* Player, const std::string& filename);
-    ~Enemy();
+    CEnemy(CDisplay& Screen, CTimer& Timer, CPlayer& m_Player, const std::string& filename);
+    ~CEnemy();
 
     void Update();
     PowerUp* GetPowerUp(){return this->powerup;}
@@ -26,7 +26,9 @@ public:
     PowerUp* powerup;
 
 private:
-    CPlayer* Player;
+    const float ENEMY_SPEED;
+
+    CPlayer& Player;
 };
 
 #endif // ENEMY_H

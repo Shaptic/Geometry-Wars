@@ -1,6 +1,6 @@
 #include "Bullet.h"
 
-Bullet::Bullet(Display* Screen, Timer* timer, int x, int y): BaseObject(Screen, timer, x, y)
+CBullet::CBullet(CDisplay& Screen, CTimer& timer, int x, int y): CBaseObject(Screen, timer, x, y), BULLET_SPEED(10.0f)
 {
     /* Target */
     SDL_GetMouseState(&this->dest_x, &this->dest_y);
@@ -21,7 +21,7 @@ Bullet::Bullet(Display* Screen, Timer* timer, int x, int y): BaseObject(Screen, 
     this->dy            = BULLET_SPEED * (dest_y - y) / this->unit_vector;
 }
 
-Bullet::Bullet(Display* Screen, Timer* timer, int x, int y, double angle): BaseObject(Screen, timer, x, y)
+CBullet::CBullet(CDisplay& Screen, CTimer& timer, int x, int y, double angle): CBaseObject(Screen, timer, x, y), BULLET_SPEED(10.0f)
 {
     /* Target */
     SDL_GetMouseState(&this->dest_x, &this->dest_y);
@@ -38,15 +38,15 @@ Bullet::Bullet(Display* Screen, Timer* timer, int x, int y, double angle): BaseO
      * y' = xsin(angle)+ycos(angle)
      */
     angle               = angle * (PI / 180);   // Angles must be in radians
-    this->dx            = 1.0f * (this->dx * std::cos(angle)) - (this->dy * std::sin(angle));
-    this->dy            = 1.0f * (this->dx * std::sin(angle)) + (this->dy * std::cos(angle));    
+    this->dx            = 1.0f * ((this->dx * std::cos(angle)) - (this->dy * std::sin(angle)));
+    this->dy            = 1.0f * ((this->dx * std::sin(angle)) + (this->dy * std::cos(angle)));
 }
 
-Bullet::~Bullet()
+CBullet::~CBullet()
 {
 }
 
-void Bullet::Update()
+void CBullet::Update()
 {
     this->Move_Rate(this->dx, this->dy);
 }

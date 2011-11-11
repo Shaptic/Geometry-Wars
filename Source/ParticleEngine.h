@@ -12,26 +12,26 @@
 
 static const int EMP_TIME = 5;
 
-class Bit: public BaseObject
+class CBit: public CBaseObject
 {
 public:
-    Bit(Display* Screen, Timer* timer,
+    CBit(CDisplay& Screen, CTimer& timer,
         const int x, const int y,
         const int m_dx, const int m_dy,
         const int m_lifetime);
     
-    Bit(Display* Screen, Timer* timer,
+    CBit(CDisplay& Screen, CTimer& timer,
         const int x, const int y,
         const int m_dx, const int m_dy,
         const int m_lifetime,
         const SDL_Color& color);
 
-    Bit(Display* Screen, Timer* timer,
+    CBit(CDisplay& Screen, CTimer& timer,
         const int x, const int y,
         const int m_dx, const int m_dy,
         const SDL_Color& color);
 
-    ~Bit();
+    ~CBit();
 
     void Update();
     bool IsAlive();
@@ -41,24 +41,24 @@ private:
     int dx, dy;
 };
 
-class ParticleEngine
+class CParticleEngine
 {
 public:
-    ParticleEngine(Display* Screen, Timer* timer);
-    ~ParticleEngine();
+    CParticleEngine(CDisplay& Screen, CTimer& timer);
+    ~CParticleEngine();
 
     //void GenerateEMP(const int x, const int y);
-    void ExplodeObject(BaseObject* obj);
+    void ExplodeObject(CBaseObject* obj);
     void ExplodePlayer(const int x, const int y);
-    void AddPlayerTrail(CPlayer* player,
+    void AddPlayerTrail(CPlayer& player,
         const int dx, const int dy);
     void UpdateParticles();
 
 private:
-    Display*        Screen;
-    Timer*          timer;
-    std::list<Bit*> particles;
-    std::list<Bit*> trail;
+    CDisplay&        Screen;
+    CTimer&          Timer;
+    std::list<CBit*> particles;
+    std::list<CBit*> trail;
 
     /* Unused
      * SDL_Surface*    emp;
