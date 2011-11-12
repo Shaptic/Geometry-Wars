@@ -2,7 +2,8 @@
 
 Engine::Engine(): MainMenu(Screen, EventHandler),
     Particles(Screen, Fps),
-    Player(Screen, Fps), Levels(Settings.GetLevelFile())
+    Player(Screen, Fps),
+    Levels(Settings.GetLevelFile())
 {
     if(TTF_Init() != 0)
         handleError(TTF_GetError());
@@ -32,7 +33,8 @@ Engine::~Engine()
     this->Shots.clear();
 
     /* Write the highscore to a file */
-    std::ofstream hs("highscores.dat", std::ios::in | std::ios::trunc);
+    std::ofstream hs(this->Settings.GetHighscoreFile(), std::ios::in | std::ios::trunc);
+
     if(hs.bad() || !hs.is_open())
         handleError("Unable to record score!");
 
@@ -82,9 +84,10 @@ void Engine::Menu()
 {
     if(this->MainMenu.Run() == CMenu::QUIT_ID)
         return;
+
     else
     {
-        SDL_Delay(500);
+        SDL_Delay(100);
         this->Play();
     }
 }
@@ -269,7 +272,7 @@ void Engine::Events()
 
 void Engine::ForceEMP()
 {
-    CEnemy emp(this->Screen, this->Fps, this->Player, "Data"FN_SLASH"Circle.png");
+    CEnemy emp(this->Screen, this->Fps, this->Player, "Images"FN_SLASH"Circle.png");
     emp.SetPowerUp(PowerUp::EMP);
     this->DestroyEnemy(&emp);
 }

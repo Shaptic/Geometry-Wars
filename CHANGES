@@ -100,3 +100,7 @@
         
         - Changed: New highscore
         - Changed: Level tweaking
+        
+    Version 0.5.1 (11.12.11)
+        - Fixed: Debug mode EMP strike
+        - Changed: Lowered audio quality to reduce package size
