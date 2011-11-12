@@ -2,7 +2,7 @@
 
 Engine::Engine(): MainMenu(Screen, EventHandler),
     Particles(Screen, Fps),
-    Player(CPlayer(Screen, Fps))
+    Player(Screen, Fps)
 {
     this->Fps.SetFrameRate(60);
 
@@ -11,11 +11,17 @@ Engine::Engine(): MainMenu(Screen, EventHandler),
     if(TTF_Init() != 0)
         handleError(TTF_GetError());
 
-    this->main_font     = TTF_OpenFont("C:\\Windows\\Fonts\\Arial.ttf", 24);
+    this->main_font     = TTF_OpenFont("Data"FN_SLASH"Main.ttf", 48);
+    if(!this->main_font)
+        handleError(TTF_GetError());
 
     /* Set up our main menu */
+    //this->MainMenu.SetBackground(tile_surface(LoadImage("Data"FN_SLASH"MenuBG.png"),
+    //    this->Screen.GetWidth(), this->Screen.GetHeight()));
     this->MainMenu.SetFont(this->main_font);
-    this->MainMenu.SetStartCoordinates(this->Screen.GetWidth() / 2, 200);
+    this->MainMenu.SetStartCoordinates(this->Screen.GetWidth() / 4, 200);
+    this->MainMenu.SetCenterText(false);
+    this->MainMenu.SetTextColor(create_color(50, 225, 255));
     this->MainMenu.SetHighLightColor(WHITE);
     this->MainMenu.AddMenuOption("GEOMETRY WARS!\nCreated by George Kudrayvtsev\n", BTN_TEXT, ACT_NONE);
     this->MainMenu.AddMenuOption("Play Geometry Wars!", BTN_ACTION, ACT_PLAY);
@@ -126,8 +132,6 @@ void Engine::Play()
         this->CheckCollisions();
         this->RemoveEnemies();
         this->RemoveShots();
-        this->enemy_iters.clear();
-        this->shot_iters.clear();
 
         /* Place images on the screen and 
          * update the display.
@@ -176,8 +180,8 @@ void Engine::NewGame()
 
     this->Enemies.clear();
     this->Shots.clear();
-    this->enemy_iters.clear();
-    this->shot_iters.clear();
+    this->remove_enemies.clear();
+    this->remove_shots.clear();
 
     /* Move player to center, reset score */
     this->Player.Move_Force(this->Screen.GetWidth() / 2, this->Screen.GetHeight() / 2);
@@ -229,7 +233,7 @@ void Engine::Events()
                 emp.SetPowerUp(PowerUp::EMP);
                 std::list<CEnemy*> tmp;
                 tmp.push_back(&emp);
-                this->DestroyEnemy(tmp.begin());
+                this->DestroyEnemy(*tmp.begin());
                 tmp.clear();
             }
         }
@@ -249,8 +253,8 @@ void Engine::CheckCollisions()
         {
             if((*i)->DetectCollision((*j)))
             {
-                this->DestroyEnemy(i);
-                this->shot_iters.push_back(j);
+                this->DestroyEnemy((*i));
+                this->remove_shots.push_back((*j));
                 return;
             }
         }
@@ -266,12 +270,12 @@ void Engine::CheckCollisions()
              */
             if((*i)->GetPowerUp()->ability == PowerUp::EMP)
             {
-                this->DestroyEnemy(i);
+                this->DestroyEnemy(*i);
                 return;
             }
             else
             {
-                this->DestroyEnemy(i);
+                this->DestroyEnemy(*i);
             }
         }
     }
@@ -287,11 +291,11 @@ void Engine::CheckCollisions()
     }
 }
 
-void Engine::DestroyEnemy(AllEnemies::iterator i)
+void Engine::DestroyEnemy(CEnemy* Enemy)
 {
     static SDL_Surface* explosion = NULL;
 
-    if((*i)->GetPowerUp()->ability == PowerUp::EMP)
+    if(Enemy->GetPowerUp()->ability == PowerUp::EMP)
     {
         /* EMP Destroys all enemies on the screen */
 
@@ -317,17 +321,17 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
 
         /* Then we remove the enemies */
         this->Enemies.clear();
-        this->enemy_iters.clear();
+        this->remove_enemies.clear();
     }
     else
     {
         /* Generate explosion */
-        this->Particles.ExplodeObject((*i));
+        this->Particles.ExplodeObject(Enemy);
 
         /* Increase score and add enemy for deletion */
         if(!this->debug)
             this->score += 5;
-        this->enemy_iters.push_back(i);
+        this->remove_enemies.push_back(Enemy);
 
         /* We update the highscore if it has been reached */
         if(this->score > this->high_score)
@@ -337,22 +341,26 @@ void Engine::DestroyEnemy(AllEnemies::iterator i)
 
 void Engine::RemoveEnemies()
 {
-    this->Levels.UpdateCurrentLevel(this->enemy_iters.size());
+    this->Levels.UpdateCurrentLevel(this->remove_enemies.size());
 
-    for(unsigned int i = 0; i < this->enemy_iters.size(); i++)
+    for(unsigned int i = 0; i < this->remove_enemies.size(); i++)
     {
-        delete (*this->enemy_iters[i]);
-        this->Enemies.erase(this->enemy_iters[i]);
+        delete this->remove_enemies[i];
+        this->Enemies.remove(this->remove_enemies[i]);
     }
+
+    this->remove_enemies.clear();
 }
 
 void Engine::RemoveShots()
 {
-    for(unsigned int i = 0; i < this->shot_iters.size(); i++)
+    for(unsigned int i = 0; i < this->remove_shots.size(); i++)
     {
-        delete (*this->shot_iters[i]);
-        this->Shots.erase(this->shot_iters[i]);
+        delete this->remove_shots[i];
+        this->Shots.remove(this->remove_shots[i]);
     }
+
+    this->remove_shots.clear();
 }
 
 void Engine::AddEnemy()
@@ -371,7 +379,7 @@ void Engine::ShowDebugInfo()
     static std::stringstream ss;
     static SDL_Surface* mouse   = NULL;
     static SDL_Surface* player  = NULL;
-    static TTF_Font* font       = TTF_OpenFont("C:\\Windows\\Fonts\\Arial.ttf", 16);
+    static TTF_Font* font       = TTF_OpenFont("Data"FN_SLASH"Main.ttf", 24);
 
     GetMousePosition(x, y);
 
@@ -423,12 +431,15 @@ void Engine::UpdateAll()
     this->Particles.UpdateParticles();
     this->ShowDebugInfo();
 
+    /* The color for UI elements */
+    static SDL_Color off_blue = {30, 225, 225};
+
     /* Show the score on the screen */
     static std::stringstream ss;
     ss << "SCORE: " << this->score;
 
     SDL_Surface* score_surf = render_text(this->main_font,
-        ss.str(), NULL, create_color(WHITE), CREATE_SURFACE|TRANSPARENT_BG);
+        ss.str(), NULL, off_blue, CREATE_SURFACE|TRANSPARENT_BG);
 
     this->Screen.Blit(score_surf, 0, 0);
 
@@ -436,7 +447,7 @@ void Engine::UpdateAll()
     ss << "HIGHSCORE: " << this->high_score;
 
     SDL_Surface* hs_surf = render_text(this->main_font, ss.str(),
-        NULL, create_color(WHITE), CREATE_SURFACE | TRANSPARENT_BG);
+        NULL, off_blue, CREATE_SURFACE | TRANSPARENT_BG);
 
     this->Screen.Blit(hs_surf, this->Screen.GetWidth() - get_text_width(this->main_font, ss.str()), 0);
 
@@ -444,7 +455,7 @@ void Engine::UpdateAll()
     ss << "Lives: " << this->Player.GetLives();
 
     SDL_Surface* lives = render_text(this->main_font, ss.str(),
-        NULL, create_color(WHITE), CREATE_SURFACE | TRANSPARENT_BG);
+        NULL, off_blue, CREATE_SURFACE | TRANSPARENT_BG);
 
     this->Screen.Blit(lives,
         this->Screen.GetWidth() - get_text_width(this->main_font, ss.str()),
@@ -459,8 +470,8 @@ void Engine::UpdateAll()
     for(AllBullets::iterator i = this->Shots.begin();
         i != this->Shots.end(); i++)
     {
-        if((*i)->GetX() > 800 || (*i)->GetX() < 0 ||
-           (*i)->GetY() > 600 || (*i)->GetY() < 0)
+        if((*i)->GetX() > this->Screen.GetWidth() || (*i)->GetX() < 0 ||
+           (*i)->GetY() > this->Screen.GetHeight() || (*i)->GetY() < 0)
         {
             shots_to_remove.push_back(i);
         }
@@ -485,7 +496,7 @@ void Engine::UpdateAll()
         this->Shots.erase(shots_to_remove[i]);
     }
 
-    shots_to_remove.resize(0);
+    shots_to_remove.clear();
 
     /* Update the entire display */
     this->Screen.Update();

@@ -48,7 +48,7 @@ public:
     ~CParticleEngine();
 
     //void GenerateEMP(const int x, const int y);
-    void ExplodeObject(CBaseObject* obj);
+    void ExplodeObject(const CBaseObject* obj);
     void ExplodePlayer(const int x, const int y);
     void AddPlayerTrail(CPlayer& player,
         const int dx, const int dy);

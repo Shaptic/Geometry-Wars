@@ -1,10 +1,10 @@
 #include "Player.h"
 
-CPlayer::CPlayer(CDisplay& Screen, CTimer& timer): CBaseObject(Screen, timer)
+CPlayer::CPlayer(CDisplay& Screen, CTimer& timer): CBaseObject(Screen, timer), SHOT_ANGLE(10.0)
 {
     this->SetEntity(create_surface(20, 20, create_color(GREEN)));
     this->SetCollisionBoundaries(create_rect(0, 0, 20, 20));
-    this->SetMovementBoundaries_Max(800 - 20, 600 - 20);
+    this->SetMovementBoundaries_Max(Screen.GetWidth() - 20, Screen.GetHeight() - 20);
     this->SetMovementBoundaries_Min(0, 0);
 
     SDL_GetMouseState(&this->mouse_aim_x, &this->mouse_aim_y);
@@ -60,14 +60,16 @@ void CPlayer::Shoot(std::list<CBullet*>& shots)
      * to have in order to be going in the direction of the 
      * mouse pointer.
      */
-    double angle_iter = 1.0 * SHOT_ANGLE;
+    double angle_iter = SHOT_ANGLE;
 
     for(unsigned short i = 0; i < this->to_shoot; i++)
     {
-        if(i % 2 == 0)
-            angle_iter = -(i/2.0) * SHOT_ANGLE;
+        if(i == 0)
+            angle_iter = 0;
+        else if(i % 2 == 0)
+            angle_iter = -(i / 2) * SHOT_ANGLE;
         else
-            angle_iter = (i/2.0) * SHOT_ANGLE;
+            angle_iter = ((i + 2) / 2) * SHOT_ANGLE;
 
         CBullet* shot = new CBullet(
             this->Display, this->Timer,

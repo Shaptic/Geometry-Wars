@@ -12,7 +12,7 @@ public:
     ~CEnemy();
 
     void Update();
-    PowerUp* GetPowerUp(){return this->powerup;}
+    PowerUp* GetPowerUp() const{return this->powerup;}
     void SetPowerUp(PowerUp::POWERUPS ability)
     {
         delete this->powerup;

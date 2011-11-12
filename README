@@ -7,77 +7,99 @@ Dependencies:
     - SDL_mixer
     - MSVC++ Redistributable 2010 x86
 
-Controls:
-    WASD or Arrow Keys to move your ship. Aim with your mouse
-    and click to fire. Press ~ to enable debug mode. In debug
-    mode, Q will spawn enemies, and E will force an EMP strike.
+Controls ([D] - Debug mode only):
+    Move                :   WASD / Arrow Keys
+    Aim                 :   Mouse
+    Fire                :   Left Mouse Button
+    Debug Mode          :   ~
+    Spawn Enemies [D]   :   Q
+    Force EMP [D]       :   E
     
 Changelog:
     Version 0.1 (10.22.11)
         - Initial release
-        - Features placeholder art.
-        - Added firing ability and enemies
         
     Version 0.1.1 (10.23.11)
-        - Added bullet spread and timing control
+        - Added: Bullet spread and timing control
         
     Version 0.2 (10.29.11)
-        - Added levels, powerups
-        - Improved controls
-        - Fixed the bug where the player would go offscreen
+        - Added: Levels, powerups
+        
+        - Changed: Controls
+        
+        - Fixed: A bug where the player would go offscreen
           when the window was moved
           
     Version 0.2.1 (10.31.11)
-        - Added a particle engine, enemies now explode when hit
-        - Improved levels, game starts out easier, gets harder, etc
-        - Added a shot delay
+        - Added: Particle engine, enemies now explode when hit
+        - Added: Shot delay
+        
+        - Changed: Level difficulty progression
         
     Version 0.2.2 (11.5.11)
-        - Added a single enemy graphic
-        - In debug mode, touching an enemy kills it
-        - More stable levels
-        - Player controls shooting rather than engine
-        - Added a "tail" to the player to simulate the fuel from a rocketship
+        - Added: A single enemy graphic
+        - Added: In debug mode, touching an enemy kills it
+        - Added: A "tail" to the player to simulate the fuel from a rocketship
+        
+        - Changed: More stable levels
+        - Changed: Player controls shooting rather than engine
         
     Version 0.3 (11.6.11)
-        - Added some powerups:
+        - Added: Powerups:
             - EMP: Explodes all current enemies
             - LowShotDelay: Increases rate of fire
             - MoreShots: Shoot a bigger spread of bullets
-        - Pressing "E" while in Debug Mode forces an EMP explosion
+            
+        - Added: Pressing "E" while in Debug Mode forces an EMP explosion
         
     Version 0.3.1 (11.6.11)
-        - Fixed a segfault occuring after the game ended
-        - Removed the console window popup
+        - Removed: Console window popup
+        - Fixed: Segfault occuring after the game ended
     
     Version 0.3.5 (11.10.11)
-        - Added high score tracking
-            - Doesn't record scores while debug mode is enabled
-        - Fixed tiny menu bug
-        - Fixed memory leak in level handler
-        - Added the ability to start over after dying [Windows only]
+        - Added: High score tracking
+        - Added: The ability to start over after dying [Windows only]
+
+        - Fixed: Tiny menu bug
+        - Fixed: Memory leak in level handler
         
     Version 0.3.9 (11.10.11)
-        - Added lives
-        - Added "Extra Life" powerup
-        - Balanced out power-up spawning
-        - Fixed alpha channels
-        - "Encrypted" highscore
-        - Optimized particle engine
-        - Now levels contain filenames for enemies
-        - Added a several new graphics for enemies
-        - Explosions are now always the same color as the enemy
-        - Fixed a bug where sometimes the player would die, turning
+        - Added: lives
+        - Added: "Extra Life" powerup
+        - Added: "Encrypted" highscore
+        - Added: A several new graphics for enemies
+        
+        - Fixed: Alpha channels
+        - Fixed: Explosions are now always the same color as the enemy
+        - Fixed: Bug where sometimes the player would die, turning
           invisible for a few seconds, then being visible again, and
           invincible as well, because the life count dropped below 0
           
+        - Changed: Balanced out power-up spawning
+        - Changed: Optimized particle engine
+        - Changed: Now levels contain filenames for enemies
+          
     Version 0.4.0 (11.10.11)
-        - Re-wrote every single class to use references to objects
+        - Added: One more enemy graphic
+        
+        - Fixed: a large memory leak
+        
+        - Changed: Re-wrote every single class to use references to objects
           rather than pointers.
-        - Global namespace has been cleaned up
-        - One more enemy graphic added
-        - Fixed a large memory leak
+        - Changed: Global namespace has been cleaned up
         
     Version 0.4.1 (11.11.11)
-        - Cleaned up code
-        - Restarting the game works better
+        - Fixed: Game restarts
+        
+        - Changed: Cleaned up code
+        
+    Version 0.4.2 (11.11.11)
+        - Added: A custom font for UI
+        
+        - Fixed: Bullet spread
+        - Fixed: negative lives bug (again)
+        
+        - Changed: Levels
+        - Changed: Menu style
+        - Changed: Replaced iterators with object pointers
+        - Changed: README style

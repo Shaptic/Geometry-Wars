@@ -31,15 +31,15 @@ private:
     /* The angle that each shot (not counting the first shot)
      * is fired at from the "barrel"
      */
-    static const int SHOT_ANGLE = 5;
+    const double SHOT_ANGLE;
 
     /* The maximum amount of shots that can be fired 
      * in a single burst.
      */
     static const int MAX_SHOTS = 5;
 
+    int lives;                      // Strange negative lives glitch makes signed int needed
     unsigned int SHOT_DELAY;
-    unsigned int lives;
     unsigned int to_shoot;          // Amount of shots / burst
     unsigned int shot_delay;        // Delay between bursts
     int mouse_aim_x, mouse_aim_y;   // Mouse location

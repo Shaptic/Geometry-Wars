@@ -75,7 +75,7 @@ void CParticleEngine::GenerateEMP(const int m_x, const int m_y)
 }
 */
 
-void CParticleEngine::ExplodeObject(CBaseObject*obj)
+void CParticleEngine::ExplodeObject(const CBaseObject* obj)
 {
     /* We will spawn anywhere from 10-30 "bits" that
      * are left-over from the destroyed enemy.

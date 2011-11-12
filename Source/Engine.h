@@ -23,8 +23,8 @@ static const int PLAYER_SPEED   = 5;
 
 typedef std::list<CEnemy*>                  AllEnemies;
 typedef std::list<CBullet*>                 AllBullets;
-typedef std::vector<AllEnemies::iterator>   EnemyIterator;
-typedef std::vector<AllBullets::iterator>   ShotIterator;
+typedef std::vector<CEnemy*>                EnemyHolder;
+typedef std::vector<CBullet*>               BulletHolder;
 
 class Engine
 {
@@ -43,7 +43,7 @@ private:
     void AddEnemy();
 
     void CheckCollisions();
-    void DestroyEnemy(AllEnemies::iterator i);
+    void DestroyEnemy(CEnemy* Enemy);
     void RemoveEnemies();
     void RemoveShots();
 
@@ -60,8 +60,8 @@ private:
     AllEnemies          Enemies;
     AllBullets          Shots;
 
-    EnemyIterator       enemy_iters;
-    ShotIterator        shot_iters;
+    EnemyHolder         remove_enemies;
+    BulletHolder        remove_shots;
 
     TTF_Font*           main_font;
 

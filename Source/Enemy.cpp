@@ -75,23 +75,23 @@ CEnemy::CEnemy(CDisplay& m_Screen, CTimer& m_Timer, CPlayer& m_Player,
     switch(side)
     {
     case 0:     // TOP
-        this->x = 1.0f * (rand() % 800);
+        this->x = 1.0f * (rand() % this->Display.GetWidth());
         this->y = 1.0f * -(rand() & 50);
         break;
 
     case 1:     // BOTTOM
-        this->x = 1.0f * (rand() % 800);
-        this->y = 1.0f * (600 + rand() % 50);
+        this->x = 1.0f * (rand() % this->Display.GetWidth());
+        this->y = 1.0f * (this->Display.GetHeight() + rand() % 50);
         break;
 
     case 2:     // LEFT
         this->x = 1.0f * -(rand() % 50);
-        this->y = 1.0f * (rand() % 600);
+        this->y = 1.0f * (rand() % this->Display.GetHeight());
         break;
 
     case 3:     // RIGHT
-        this->x = 1.0f * (800 + rand() % 50);
-        this->y = 1.0f * (rand() % 600);
+        this->x = 1.0f * (this->Display.GetWidth() + rand() % 50);
+        this->y = 1.0f * (rand() % this->Display.GetHeight());
         break;
     }
 }
