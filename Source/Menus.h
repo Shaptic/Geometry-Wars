@@ -16,6 +16,9 @@
 #ifndef MENUS_H
 #define MENUS_H
 
+/* For debugging */
+#include <cassert>
+
 /* Include standard headers */
 #include <vector>
 #include <string>
@@ -156,7 +159,10 @@ public:
      */
     void SetMusic(const char* filename);
     void SetMusic(const string& filename);
+    //void SetMusic(const vector<string>& filenames);   // More than one music file,
+                                                        // played one after the other
     void SetMusic(Mix_Music* music);
+    void SetMusicVolume(int v){if(music != NULL)Mix_VolumeMusic(v);}
 
     /* Set the coordinates for the first button. Also can
      * set whether or not the text should be aligned in

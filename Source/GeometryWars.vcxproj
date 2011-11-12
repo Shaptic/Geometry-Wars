@@ -58,7 +58,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <Profile>true</Profile>
+      <Profile>false</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -92,7 +92,9 @@
     <ClInclude Include="ParticleEngine.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PowerUps.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SDL_Helper.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -110,7 +112,14 @@
     <ClCompile Include="ParticleEngine.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SDL_Helper.cpp" />
+    <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Timer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GeometryWars.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,30 +2,15 @@
 
 Engine::Engine(): MainMenu(Screen, EventHandler),
     Particles(Screen, Fps),
-    Player(Screen, Fps)
+    Player(Screen, Fps), Levels(Settings.GetLevelFile())
 {
-    this->Fps.SetFrameRate(60);
-
-    srand((unsigned int)time(NULL));
-
     if(TTF_Init() != 0)
         handleError(TTF_GetError());
 
-    this->main_font     = TTF_OpenFont("Data"FN_SLASH"Main.ttf", 48);
-    if(!this->main_font)
-        handleError(TTF_GetError());
+    srand((unsigned int)time(NULL));
 
-    /* Set up our main menu */
-    //this->MainMenu.SetBackground(tile_surface(LoadImage("Data"FN_SLASH"MenuBG.png"),
-    //    this->Screen.GetWidth(), this->Screen.GetHeight()));
-    this->MainMenu.SetFont(this->main_font);
-    this->MainMenu.SetStartCoordinates(this->Screen.GetWidth() / 4, 200);
-    this->MainMenu.SetCenterText(false);
-    this->MainMenu.SetTextColor(create_color(50, 225, 255));
-    this->MainMenu.SetHighLightColor(WHITE);
-    this->MainMenu.AddMenuOption("GEOMETRY WARS!\nCreated by George Kudrayvtsev\n", BTN_TEXT, ACT_NONE);
-    this->MainMenu.AddMenuOption("Play Geometry Wars!", BTN_ACTION, ACT_PLAY);
-    this->MainMenu.AddMenuOption("Quit", BTN_ACTION, ACT_QUIT);
+    this->Fps.SetFrameRate(60);
+    this->LoadFiles();
 
 #ifdef _DEBUG
     this->debug         = true;
@@ -55,6 +40,42 @@ Engine::~Engine()
     hs << this->high_score * hash << hash << "\n";
 
     hs.close();
+
+    Mix_CloseAudio();
+}
+
+void Engine::LoadHighScore()
+{
+    std::string tmp;
+    std::ifstream hs(this->Settings.GetHighscoreFile());
+
+    if(!hs.is_open())
+        this->high_score = 0;
+    else
+    {
+        std::getline(hs, tmp);
+
+        int hash = atoi(tmp.substr(tmp.length() - 2, -1).c_str());
+        this->high_score = atoi(tmp.substr(0, tmp.length() - 2).c_str()) / hash;
+        tmp.clear();
+    }
+
+    hs.close();
+}
+
+void Engine::LoadFiles()
+{
+    /* Set up our main menu */
+    this->MainMenu.SetFont(this->Settings.GetTitleFont());
+    this->MainMenu.SetStartCoordinates(this->Screen.GetWidth() / 4, 200);
+    this->MainMenu.SetCenterText(false);
+    this->MainMenu.SetTextColor(UI_COLOR);
+    this->MainMenu.SetHighLightColor(WHITE);
+    this->MainMenu.SetMusic(this->Settings.GetTitleMusic());
+    this->MainMenu.SetMusicVolume(MIX_MAX_VOLUME / 2);
+    this->MainMenu.AddMenuOption("GEOMETRY WARS!\nCreated by George Kudrayvtsev\n", BTN_TEXT, ACT_NONE);
+    this->MainMenu.AddMenuOption("Play Geometry Wars!", BTN_ACTION, ACT_PLAY);
+    this->MainMenu.AddMenuOption("Quit", BTN_ACTION, ACT_QUIT);
 }
 
 void Engine::Menu()
@@ -63,7 +84,7 @@ void Engine::Menu()
         return;
     else
     {
-        SDL_Delay(100);
+        SDL_Delay(500);
         this->Play();
     }
 }
@@ -80,6 +101,12 @@ void Engine::Play()
     int     frame   = 0;
 
     GetMousePosition(mouse_x, mouse_y);
+
+    if(Mix_PlayingMusic() == 0) // No music
+    {
+        Mix_PlayMusic(this->Settings.GetGameplayMusic(), 0);
+        Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
+    }
 
     while(!this->quit)
     {
@@ -148,10 +175,29 @@ void Engine::Play()
             frame++;
             this->UpdateAll();
         }
-        if(MessageBoxA(NULL, "Game over! Do you want to play again?", "Play Again?", MB_YESNO) == IDYES)
+
+        Mix_PauseMusic();
+
+        SDL_Surface* again = render_text(this->Settings.GetTitleFont(), "Game over!\nPress SPACE to play again!\nAnd ESCAPE to quit",
+            NULL, UI_COLOR, CREATE_SURFACE | ALIGN_CENTER | TRANSPARENT_BG);
+
+        while(this->play_again)
         {
-            this->NewGame();
+            if(CheckQuit(SDLK_ESCAPE) || CheckQuit_Event())
+                this->play_again = false;
+
+            if(IsDown(SDLK_SPACE))
+                break;
+            
+            this->Screen.ClearScreen();
+            this->Screen.Blit(again,
+                (this->Screen.GetWidth() / 2) - (again->clip_rect.w / 2),
+                (this->Screen.GetHeight() / 2) - (again->clip_rect.h / 2));
+            this->Screen.Update();
         }
+
+        if(this->play_again)
+            this->NewGame();
     }
 }
 
@@ -190,25 +236,8 @@ void Engine::NewGame()
     this->quit = false;
     this->play_again = true;
 
+    Mix_ResumeMusic();
     this->Play();
-}
-
-void Engine::LoadHighScore()
-{
-    std::string tmp;
-    std::ifstream hs("highscores.dat");
-
-    if(!hs.is_open())
-        this->high_score = 0;
-    else
-    {
-        std::getline(hs, tmp, '\n');
-        int hash = atoi(tmp.substr(tmp.length() - 2, -1).c_str());
-        this->high_score = atoi(tmp.substr(0, tmp.length() - 2).c_str()) / hash;
-        tmp.clear();
-    }
-
-    hs.close();
 }
 
 void Engine::Events()
@@ -229,18 +258,20 @@ void Engine::Events()
             else if(evt.key.keysym.sym == SDLK_e && this->debug)
             {
                 /* The "e" key forces an EMP explosion */
-                CEnemy emp(this->Screen, this->Fps, this->Player, "Data"FN_SLASH"Circle.png");
-                emp.SetPowerUp(PowerUp::EMP);
-                std::list<CEnemy*> tmp;
-                tmp.push_back(&emp);
-                this->DestroyEnemy(*tmp.begin());
-                tmp.clear();
+                this->ForceEMP();
             }
         }
     }
 
     if(IsDown(SDLK_q) && this->debug)
         this->AddEnemy();
+}
+
+void Engine::ForceEMP()
+{
+    CEnemy emp(this->Screen, this->Fps, this->Player, "Data"FN_SLASH"Circle.png");
+    emp.SetPowerUp(PowerUp::EMP);
+    this->DestroyEnemy(&emp);
 }
 
 void Engine::CheckCollisions()
@@ -251,15 +282,15 @@ void Engine::CheckCollisions()
         for(AllBullets::iterator j = this->Shots.begin();
             j != this->Shots.end(); j++)
         {
-            if((*i)->DetectCollision((*j)))
+            if((*i)->DetectCollision(*j))
             {
-                this->DestroyEnemy((*i));
-                this->remove_shots.push_back((*j));
+                this->DestroyEnemy(*i);
+                this->remove_shots.push_back(*j);
                 return;
             }
         }
 
-        if(this->Player.DetectCollision((*i)))
+        if(this->Player.DetectCollision(*i))
         {
             if(!this->debug)
                 this->Player.Kill();
@@ -379,7 +410,7 @@ void Engine::ShowDebugInfo()
     static std::stringstream ss;
     static SDL_Surface* mouse   = NULL;
     static SDL_Surface* player  = NULL;
-    static TTF_Font* font       = TTF_OpenFont("Data"FN_SLASH"Main.ttf", 24);
+    static TTF_Font* font       = this->Settings.GetUIFont();
 
     GetMousePosition(x, y);
 
@@ -420,6 +451,13 @@ void Engine::UpdateAll()
     if(this->Player.GetY() > this->Screen.GetHeight())
         this->Player.Move_Force(this->Screen.GetWidth() / 2, this->Screen.GetHeight() / 2);
 
+    /* Play the next song if the previous one has ended */
+    if(Mix_PlayingMusic() == 0)
+    {
+        Mix_PlayMusic(this->Settings.GetGameplayMusic(), 0);
+        Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
+    }
+
     /* Now we clear the screen, update the player,
      * show some info if debugging, show score, 
      * delete off-screen sprites, update locations,
@@ -431,35 +469,35 @@ void Engine::UpdateAll()
     this->Particles.UpdateParticles();
     this->ShowDebugInfo();
 
-    /* The color for UI elements */
-    static SDL_Color off_blue = {30, 225, 225};
+    /* The font style for the UI */
+    static TTF_Font* ui = this->Settings.GetUIFont();
 
     /* Show the score on the screen */
     static std::stringstream ss;
     ss << "SCORE: " << this->score;
 
-    SDL_Surface* score_surf = render_text(this->main_font,
-        ss.str(), NULL, off_blue, CREATE_SURFACE|TRANSPARENT_BG);
+    SDL_Surface* score_surf = render_text(ui,
+        ss.str(), NULL, UI_COLOR, CREATE_SURFACE|TRANSPARENT_BG);
 
     this->Screen.Blit(score_surf, 0, 0);
 
     ss.str(string());
     ss << "HIGHSCORE: " << this->high_score;
 
-    SDL_Surface* hs_surf = render_text(this->main_font, ss.str(),
-        NULL, off_blue, CREATE_SURFACE | TRANSPARENT_BG);
+    SDL_Surface* hs_surf = render_text(ui, ss.str(),
+        NULL, UI_COLOR, CREATE_SURFACE | TRANSPARENT_BG);
 
-    this->Screen.Blit(hs_surf, this->Screen.GetWidth() - get_text_width(this->main_font, ss.str()), 0);
+    this->Screen.Blit(hs_surf, this->Screen.GetWidth() - get_text_width(ui, ss.str()), 0);
 
     ss.str(string());
     ss << "Lives: " << this->Player.GetLives();
 
-    SDL_Surface* lives = render_text(this->main_font, ss.str(),
-        NULL, off_blue, CREATE_SURFACE | TRANSPARENT_BG);
+    SDL_Surface* lives = render_text(ui, ss.str(),
+        NULL, UI_COLOR, CREATE_SURFACE | TRANSPARENT_BG);
 
     this->Screen.Blit(lives,
-        this->Screen.GetWidth() - get_text_width(this->main_font, ss.str()),
-        this->Screen.GetHeight() - get_text_height(this->main_font, ss.str()));
+        this->Screen.GetWidth() - get_text_width(ui, ss.str()),
+        this->Screen.GetHeight() - get_text_height(ui, ss.str()));
 
     ss.str(string());
 

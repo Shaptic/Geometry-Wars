@@ -18,13 +18,15 @@
 #include "Level.h"
 #include "Timer.h"
 #include "ParticleEngine.h"
+#include "Settings.h"
 
-static const int PLAYER_SPEED   = 5;
-
+typedef std::vector<Mix_Music*>             AllMusic;
 typedef std::list<CEnemy*>                  AllEnemies;
 typedef std::list<CBullet*>                 AllBullets;
 typedef std::vector<CEnemy*>                EnemyHolder;
 typedef std::vector<CBullet*>               BulletHolder;
+
+static const SDL_Color UI_COLOR = {30, 225, 225};
 
 class Engine
 {
@@ -37,11 +39,13 @@ public:
     void NewGame();
 
 private:
+    void LoadFiles();
     void LoadHighScore();
     void Events();
 
     void AddEnemy();
 
+    void ForceEMP();
     void CheckCollisions();
     void DestroyEnemy(CEnemy* Enemy);
     void RemoveEnemies();
@@ -50,7 +54,10 @@ private:
     void ShowDebugInfo();
     void UpdateAll();
 
+    static const int PLAYER_SPEED = 5;
+
     CDisplay            Screen;
+    CSettings           Settings;
     CTimer              Fps;
     CEvents             EventHandler;
     CMenu               MainMenu;
@@ -62,8 +69,6 @@ private:
 
     EnemyHolder         remove_enemies;
     BulletHolder        remove_shots;
-
-    TTF_Font*           main_font;
 
     bool                quit;       // Quit the game
     bool                play_again; // Is playing again a possibility?

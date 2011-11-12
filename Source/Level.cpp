@@ -7,6 +7,9 @@ CLevelManager::CLevelManager()
     string tmp;
     ifstream file("LevelData.db");
 
+    if(!file.is_open())
+        handleError("Unable to load level data!");
+
     /* The first line of the file says how many
      * levels there are formatted like so:
      * LEVELCOUNT:#OfLevels

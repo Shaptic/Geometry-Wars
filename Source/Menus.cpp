@@ -66,12 +66,18 @@ void CMenu::SetBackground(const string& filename)
 
 void CMenu::SetFont(TTF_Font* font)
 {
+    assert(font != NULL);
+
     this->font = font;
 }
 
 void CMenu::SetFont(const char* font_name)
 {
+    assert(font_name != NULL);
+
     this->font = TTF_OpenFont(font_name, 32);
+    if(!this->font)
+        handleError(TTF_GetError());
 }
 
 void CMenu::SetFont(const string& font_name)
@@ -102,6 +108,8 @@ void CMenu::SetHighLightColor(const SDL_Color& color)
 void CMenu::SetMusic(const char* filename)
 {
     this->music = Mix_LoadMUS(filename);
+    if(!this->music)
+        handleError(Mix_GetError());
 }
 
 void CMenu::SetMusic(const string& filename)
@@ -111,6 +119,8 @@ void CMenu::SetMusic(const string& filename)
 
 void CMenu::SetMusic(Mix_Music* music)
 {
+    assert(music != NULL);
+
     this->music = music;
 }
 
