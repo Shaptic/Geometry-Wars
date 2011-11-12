@@ -98,6 +98,7 @@ Changelog:
         
         - Fixed: Bullet spread
         - Fixed: negative lives bug (again)
+        - Fixed: Player powerups reset on death
         
         - Changed: Levels
         - Changed: Menu style

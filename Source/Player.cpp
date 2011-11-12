@@ -42,6 +42,14 @@ void CPlayer::Reset()
     this->SHOT_DELAY = REGULAR_SHOT_DELAY;
 
     this->lives             = 1;
+
+    for(std::list<PowerUp*>::iterator i= this->all_powerups.begin();
+        i != this->all_powerups.end(); i++)
+    {
+        delete (*i);
+    }
+
+    this->all_powerups.clear();
 }
 
 void CPlayer::Kill()
