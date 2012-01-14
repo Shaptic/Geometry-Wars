@@ -105,5 +105,8 @@
         - Fixed: Debug mode EMP strike
         - Changed: Lowered audio quality to reduce package size
 
-    Version 1.0 (1.13.12
+    Version 1.0 (1.13.12)
         - Completely re-written with new graphics, interface, and gameplay.
+
+    Version 1.0.1 (1.13.12)
+        - Fixed: Life count wouldn't reset after death.
