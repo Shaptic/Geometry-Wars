@@ -256,6 +256,9 @@ void Engine::Reset()
 
     this->Levels.Reset();
     this->Player.Reset();
+
+    this->Score.UpdateItem("Score: ", 0);
+    this->Score.UpdateItem("Lives: ", 3);
 }
 
 void Engine::Events()
