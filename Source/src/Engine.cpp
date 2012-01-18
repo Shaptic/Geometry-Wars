@@ -44,6 +44,32 @@ Engine::Engine(): Settings("Settings.ini"),
 
     if(!this->Game_Music)
         handleError(Mix_GetError());
+
+    std::string hs_filename(this->Settings.GetValueAt("HighscoreFile"));
+    if(hs_filename.empty())
+        this->Settings.CreateValue("HighscoreFile", "Highscore.dat");
+
+    hs_filename = this->Settings.GetValueAt("HighscoreFile");
+
+    std::string scoreline;
+
+    this->HighscoreFile.open(hs_filename, std::ios::in);
+    std::getline(this->HighscoreFile, scoreline);
+    this->HighscoreFile.flush();
+    this->HighscoreFile.close();
+
+    if(scoreline.empty())
+        this->high_score = 0;
+    else
+    {
+        int hash = atoi(scoreline.substr(scoreline.length() - 2, -1).c_str());
+        this->high_score = atoi(scoreline.substr(0, scoreline.length() - 2).c_str()) / hash;
+        scoreline.clear();
+    }
+
+    y_offset = 10;
+    this->Score.AddItem(this->Display.GetWidth() - get_text_width(this->UI_Font, "Highscore: 99999"), 
+        y_offset, "Highscore: ", this->high_score);
 }
 
 Engine::~Engine()
@@ -52,6 +78,17 @@ Engine::~Engine()
     this->Garbage.TrashBullets(this->Bullets);
     this->Garbage.TrashEnemies(this->Enemies);
     this->Garbage.EmptyTrash(this->Enemies, this->Bullets);
+
+    this->HighscoreFile.open(this->Settings.GetValueAt("HighscoreFile"), std::ios::out, std::ios::trunc);
+    
+    if(this->HighscoreFile.bad() || !this->HighscoreFile.is_open())
+        handleError("Unable to record high score!", false);
+
+    int hash = 10 + rand() % 10;
+    this->HighscoreFile << this->high_score * hash << hash << "\n";
+
+    this->HighscoreFile.flush();
+    this->HighscoreFile.close();
 }
 
 void Engine::Menu()
@@ -350,6 +387,11 @@ bool Engine::CheckCollisions()
                     if(!this->Debugger.IsDebug())
                     {
                         this->Score.UpdateItem_Increment("Score: ", 5);
+                        if(this->Score.GetItemValue("Score: ") >= this->high_score)
+                        {
+                            this->high_score = this->Score.GetItemValue("Score: ");
+                            this->Score.UpdateItem("Highscore: ", this->high_score);
+                        }
                     }
 
                     this->Garbage.TrashEnemy(*i);
@@ -386,6 +428,13 @@ bool Engine::CheckCollisions()
                 else
                 {
                     this->Score.UpdateItem_Increment("Score: ", 5);
+
+                    if(this->Score.GetItemValue("Score: ") >= this->high_score)
+                    {
+                        this->high_score = this->Score.GetItemValue("Score: ");
+                        this->Score.UpdateItem("Highscore: ", this->high_score);
+                    }
+
                     return false;
                 }
             }

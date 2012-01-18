@@ -103,7 +103,7 @@ void CPlayer::Reset()
     this->PlayerPowerUps.clear();
     this->bullets = 50;
     this->shot_delay = 0;
-    this->lives = 1;
+    this->lives = 3;
     this->speed = DEF_PLAYER_SPEED;
 
     this->Move_Force(this->Display.GetWidth() / 2, this->Display.GetHeight() / 2);

@@ -4,6 +4,9 @@
 /* For storage */
 #include <list>
 
+/* For highscores */
+#include <fstream>
+
 /* SDL API and other libraries */
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
@@ -89,6 +92,10 @@ private:
     CGarbageDisposal    Garbage;
     
     CMenu               MainMenu;
+
+    /* Highscore data */
+    std::fstream        HighscoreFile;
+    int                 high_score;
 
     /* Game background */
     SDL_Surface*        Game_BG;

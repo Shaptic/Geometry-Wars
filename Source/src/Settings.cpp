@@ -88,7 +88,6 @@ std::string CSettingsManager::ChooseValueAt(const string& id)
     return string("");
 }
 
-
 void CSettingsManager::CreateValue(const string& id, const string& value)
 {
     /* Add a value to the Settings file. 

@@ -50,6 +50,10 @@ public:
      */
     int  AddItem(const int x, const int y, const char* primary, int var);
 
+    /* Retrieve the value for a certain element */
+    int  GetItemValue(const char* primary){return this->FindItem(primary)->var;}
+    int  GetItemValue(const int id){return this->FindItem(id)->var;}
+
     /* Updating an item on the scoreboard can be done either by using
      * the unique ID returned by AddItem(), or by searching all of the
      * items for the primary text line.
