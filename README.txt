@@ -1,11 +1,9 @@
-A simple Geometry Wars clone written in C++ using the SDL API.
+ShapeWars v1.0.2
+By George Kudrayvtsev
 
-Dependencies:
-    - SDL 1.2
-    - SDL_image
-    - SDL_ttf
-    - SDL_mixer
-    - MSVC++ Redistributable 2010 x86
+Instructions: 
+    Score as many points as possible by avoiding and
+    shooting down enemies!
 
 Controls ([D] - Debug mode only):
     Move                :   WASD / Arrow Keys
@@ -13,4 +11,3 @@ Controls ([D] - Debug mode only):
     Fire                :   Left Mouse Button
     Debug Mode          :   ~
     Spawn Enemies [D]   :   Q
-    Force EMP [D]       :   E
