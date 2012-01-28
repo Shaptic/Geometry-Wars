@@ -15,7 +15,7 @@ public:
 
     void                Update(const CPlayer& m_Player);
     bool                Die(const int damage);
-    CPlayer::PowerUp&   GetPowerUp();
+    CPlayer::PowerUp&   GetPowerUp(){return this->powerup;}
 
 private:
     const float ENEMY_SPEED;

@@ -113,6 +113,7 @@ void CEnemy::Init()
         break;
     }
 
+#ifndef _DEBUG
     /* Are we going to drop a power-up on death? */
     if(rand() % 10 == 4)    // 10% chance of getting a powerup
     {
@@ -130,9 +131,19 @@ void CEnemy::Init()
         {
             this->powerup.ability  = (CPlayer::PowerUp::ABILITY)
                 (CPlayer::PowerUp::AMMO_PACK + rand() % CPlayer::PowerUp::TOTAL_POWERUPS);
-            this->powerup.duration = 60 * 60;    // One minute
+            this->powerup.duration = 60 * 20;    // 20 seconds
         }
     }
+    else
+    {
+        this->powerup.ability = CPlayer::PowerUp::NO_POWERUP;
+        this->powerup.duration= -1;
+    }
+#else
+    /* Testing power ups in debug builds */
+    this->powerup.ability = CPlayer::PowerUp::BURST_FIRE;
+    this->powerup.duration= 60;
+#endif // _DEBUG
 
     /* A full health bar */
     this->health_bar = create_surface(25, 5, create_color(GREEN));

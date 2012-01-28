@@ -6,7 +6,8 @@ Engine::Engine(): Settings("Settings.ini"),
     Particles(Display, Timer),
     Debugger(Display, Settings),
     Levels(Settings),
-    MainMenu(Display)
+    MainMenu(Display),
+    Menu_Files(Settings.GetValueAt("MenuDataRoot"))
 {
     srand((unsigned int)time(NULL));
 
@@ -22,7 +23,7 @@ Engine::Engine(): Settings("Settings.ini"),
     this->Player.SetMovementBoundaries_Min(0, 0);
 
     this->quit      = false;
-    this->Game_BG   = LoadImage_Alpha(this->Settings.GetValueAt("GameBackground"));
+    this->Game_BG   = LoadImage_Alpha(combine(this->Menu_Files, this->Settings.GetValueAt("GameBackground").c_str()));
     this->Game_Music= Mix_LoadMUS(this->Settings.GetValueAt("GameMusic").c_str());
     this->Menu_Font = TTF_OpenFont(this->Settings.GetValueAt("MenuFont").c_str(),
         atoi(this->Settings.GetValueAt("MenuFontSize").c_str()));
@@ -95,8 +96,8 @@ void Engine::Menu()
 {
     Mix_Music*   music          = Mix_LoadMUS(this->Settings.GetValueAt("MenuMusic").c_str());
 
-    SDL_Surface* background     = LoadImage("Images/Menu_BG.png");
-    SDL_Surface* menu_overlay   = LoadImage_Alpha("Images/Menu_Options_Overlay.png");
+    SDL_Surface* background     = LoadImage(combine(this->Menu_Files, this->Settings.GetValueAt("MenuBackground").c_str()));
+    SDL_Surface* menu_overlay   = LoadImage_Alpha(combine(this->Menu_Files, "Menu_Options_Overlay.png"));
     SDL_Surface* text           = create_surface_alpha(this->Display.GetWidth(), this->Display.GetHeight());
     
     /* To generate explosions */
@@ -104,10 +105,10 @@ void Engine::Menu()
     Particle->SetEntity(create_surface(1, 1, create_color(rand() % 255, rand() % 255, rand() % 255)));
     Particle->Move_Force(rand() % this->Display.GetWidth(), rand() % this->Display.GetHeight());
 
-    int play_id     = this->MainMenu.AddMenuItem(50, 75, "Images/Menu_PlayGame.png", "Images/Menu_PlayGame_High.png");
-    int options_id  = this->MainMenu.AddMenuItem(50, 175, "Images/Menu_Options.png", "Images/Menu_Options_High.png");
-    int credits_id  = this->MainMenu.AddMenuItem(50, 275, "Images/Menu_Credits.png", "Images/Menu_Credits_High.png");
-    int quit_id     = this->MainMenu.AddMenuItem(50, 375, "Images/Menu_Quit.png", "Images/Menu_Quit_High.png");
+    int play_id     = this->MainMenu.AddMenuItem(50, 75,  combine(this->Menu_Files, "Menu_PlayGame.png"),   combine(this->Menu_Files, "Menu_PlayGame_High.png"));
+    int options_id  = this->MainMenu.AddMenuItem(50, 175, combine(this->Menu_Files, "Menu_Options.png"),    combine(this->Menu_Files, "Menu_Options_High.png"));
+    int credits_id  = this->MainMenu.AddMenuItem(50, 275, combine(this->Menu_Files, "Menu_Credits.png"),    combine(this->Menu_Files, "Menu_Credits_High.png"));
+    int quit_id     = this->MainMenu.AddMenuItem(50, 375, combine(this->Menu_Files, "Menu_Quit.png"),       combine(this->Menu_Files, "Menu_Quit_High.png"));
 
     SDL_Surface* tmp = render_text(this->Menu_Font, "Shape Wars", NULL, create_color(0, 190, 225), CREATE_SURFACE | TRANSPARENT_BG);
     SDL_SetAlpha(tmp, 0, SDL_ALPHA_TRANSPARENT);
@@ -118,6 +119,7 @@ void Engine::Menu()
 
     this->Menu_Font = TTF_OpenFont(this->Settings.GetValueAt("MenuFont").c_str(), 32);
     tmp = render_text(this->Menu_Font, "by George\nKudrayvtsev", NULL, create_color(0, 190, 225), CREATE_SURFACE | TRANSPARENT_BG);
+    SDL_Surface* credits = render_text(this->Menu_Font, CREDITS_STR, NULL, create_color(0, 190, 225), CREATE_SURFACE | TRANSPARENT_BG);
     SDL_SetAlpha(tmp, 0, SDL_ALPHA_TRANSPARENT);
     this->Display.Blit(text, tmp, 375, 200);
     SDL_FreeSurface(tmp);
@@ -150,7 +152,7 @@ void Engine::Menu()
         }
 
         if(CheckQuit_Event())
-            break;
+            this->quit = true;
 
         this->Display.ClearScreen(background);
         
@@ -163,21 +165,21 @@ void Engine::Menu()
         
         if(status == play_id)
         {
-            /*int time = 0;
-            while(time <= 100)
-            {
-                this->Timer.Start();
-                time++;
-                this->Display.ClearScreen();
-                SDL_Surface* encouragement = render_text(this->Menu_Font, "They are pussies;\nYou are a viking;\nBeat the shit\nout of them.", NULL, create_color(0, 190, 225), CREATE_SURFACE | ALIGN_CENTER | TRANSPARENT_BG);
-                this->Display.Blit(encouragement, this->Display.GetWidth() / 2, this->Display.GetHeight() / 2);
-                this->Display.Update();
-                this->Timer.DelayFPS();
-                SDL_FreeSurface(encouragement);
-            }*/
-
+            Mix_PauseMusic();
             this->SinglePlayerGame();
             break;
+        }
+        else if(status == credits_id)
+        {
+            SDL_Surface* credits_tmp = background;
+            this->Display.Blit(credits_tmp, credits, 0, 0);
+            while(!this->quit)
+            {
+                if(CheckQuit_Event())
+                    this->quit = true;
+                this->Display.Blit(credits_tmp, 0, 0);
+                this->Display.Update();
+            }
         }
         else if(status == quit_id)
         {
@@ -196,10 +198,17 @@ void Engine::SinglePlayerGame()
      */
     SDL_Delay(100);
 
-    Mix_ResumeMusic();
+    /* Play game music! */
+    if(Mix_PlayMusic(this->Game_Music, -1) == -1)
+    {
+        char error[256];
+        sprintf(error, "In-game music disabled!\nError: %s", Mix_GetError());
+        handleError(error, false);
+    }
+
+    Mix_VolumeMusic(50);
 
     /* Begin main game loop */
-
     while(!this->quit)
     {
         this->Timer.Start();
@@ -358,6 +367,23 @@ void Engine::Events()
     }
 }
 
+void Engine::GenerateEMP()
+{
+    this->Levels.IncreaseKillCount(this->Enemies.size());
+    this->Player.IncreaseAmmo(5 * this->Enemies.size());
+    if(!this->Debugger.IsDebug())
+        this->Score.UpdateItem_Increment("Score: ", 5 * this->Enemies.size());
+
+    for(CEnemies::iterator i = this->Enemies.begin();
+        i != this->Enemies.end(); i++)
+    {
+        this->Particles.GenerateExplosion(*i);
+    }
+
+    this->Garbage.TrashEnemies(this->Enemies);
+    this->Garbage.EmptyTrash(this->Enemies, this->Bullets);
+}
+
 bool Engine::CheckCollisions()
 {
     /* For every enemy that is alive, check
@@ -366,12 +392,19 @@ bool Engine::CheckCollisions()
      * Because std::list is stupid, you must
      * break out of the loop everytime you
      * want to delete something, meaning sometimes
-     * bullet and enemy collisions won't register.
+     * bullet and enemy collisions won't register
+     * at the right time, especially if there is an
+     * extremely large amount of them.
      * TODO: Maybe solve this?
      */
     for(CEnemies::iterator i = this->Enemies.begin();
         i != this->Enemies.end(); i++)
     {
+        /* Check if any of the bullets have collided with any
+         * of the enemies. If they have, and the enemy is dead,
+         * set up power-ups accordingly. If not dead, just add
+         * the damage.
+         */
         for(CBullets::iterator j = this->Bullets.begin();
             j != this->Bullets.end(); j++)
         {
@@ -379,73 +412,99 @@ bool Engine::CheckCollisions()
             {
                 if((*i)->Die(this->Player.GetDamage()))
                 {
-                    this->Levels.IncreaseKillCount(1);
-                    this->Player.IncreaseAmmo(5);
-
-                    this->Particles.GenerateExplosion(*i);
-
-                    if(!this->Debugger.IsDebug())
+                    if(this->HandlePowerups(*i))    // Power-up isn't an EMP so we destroy
+                                                    // the single enemy
                     {
-                        this->Score.UpdateItem_Increment("Score: ", 5);
-                        if(this->Score.GetItemValue("Score: ") >= this->high_score)
+                        if(!this->Debugger.IsDebug())
                         {
-                            this->high_score = this->Score.GetItemValue("Score: ");
-                            this->Score.UpdateItem("Highscore: ", this->high_score);
+                            this->Score.UpdateItem_Increment("Score: ", 5);
+                            if(this->Score.GetItemValue("Score: ") >= this->high_score)
+                            {
+                                this->high_score = this->Score.GetItemValue("Score: ");
+                                this->Score.UpdateItem("Highscore: ", this->high_score);
+                            }
                         }
-                    }
 
-                    this->Garbage.TrashEnemy(*i);
+                        this->Levels.IncreaseKillCount(1);
+                        this->Player.IncreaseAmmo(5);
+                    }
                 }
+
                 this->Garbage.TrashBullet(*j);
                 return false;
             }
         }
+        /* If the player has run into the enemy, lose
+         * a life, check powerups, destroy the enemy,
+         * explode, and if no lives are left, end the game.
+         */
         if(this->Player.DetectCollision(*i))
         {
-            if((*i)->Die(this->Player.GetDamage()))
+            if((*i)->Die(this->Player.GetDamage() * 1000))  // Damage is 1000 so there's no issue with
+                                                            // the enemy not dying
             {
-                this->Player.IncreaseAmmo(5);
-                this->Levels.IncreaseKillCount(1);
-                this->Particles.GenerateExplosion(*i);
-                this->Garbage.TrashEnemy(*i);
+                if(this->HandlePowerups(*i))
+                {
+                    this->Levels.IncreaseKillCount(1);
+                    this->Player.IncreaseAmmo(5);
+                }
             }
-
+            
             if(!this->Debugger.IsDebug())
             {
                 /* Reduce life supply, if we have no more, die
                  * for realsies. 
-                 * TODO: Fix the fact that hitting an enemy takes >1 life based
-                 *       on enemy health.
                  */
                 this->Player.Die();
-                this->Score.UpdateItem("Lives: ", this->Player.GetLives());
 
                 if(this->Player.GetLives() <= 0)
                 {
                     this->Particles.GenerateExplosion(&this->Player);
                     return true;
                 }
-                else
+
+                this->Score.UpdateItem_Increment("Score: ", 5);
+                if(this->Score.GetItemValue("Score: ") >= this->high_score)
                 {
-                    this->Score.UpdateItem_Increment("Score: ", 5);
-
-                    if(this->Score.GetItemValue("Score: ") >= this->high_score)
-                    {
-                        this->high_score = this->Score.GetItemValue("Score: ");
-                        this->Score.UpdateItem("Highscore: ", this->high_score);
-                    }
-
-                    return false;
+                    this->high_score = this->Score.GetItemValue("Score: ");
+                    this->Score.UpdateItem("Highscore: ", this->high_score);
                 }
             }
+
+            return false;
         }
     }
 
     return false;
 }
 
+bool Engine::HandlePowerups(CEnemy* Enemy)
+{
+    CPlayer::PowerUp Tmp = Enemy->GetPowerUp();
+
+    if(Tmp.ability == CPlayer::PowerUp::NUKE)
+    {
+        this->GenerateEMP();
+        return false;
+    }
+    else if(Tmp.ability != CPlayer::PowerUp::NO_POWERUP)
+    {
+        this->Player.AddPowerUp(Enemy->GetPowerUp());
+        this->Particles.GenerateExplosion(Enemy);
+        this->Garbage.TrashEnemy(Enemy);
+    }
+    else
+    {
+        this->Particles.GenerateExplosion(Enemy);
+        this->Garbage.TrashEnemy(Enemy);
+    }
+
+    return true;
+}
+
 void Engine::Update()
 {
+    this->Score.UpdateItem("Lives: ", this->Player.GetLives());
     this->Score.UpdateItem("Ammo Remaining: ", this->Player.GetAmmoCount());
 
     if(this->Levels.CanSpawn())

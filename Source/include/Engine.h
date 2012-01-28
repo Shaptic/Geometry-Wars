@@ -51,6 +51,9 @@
 /* Controlling the Settings.ini file */
 #include "Settings.h"
 
+/* For the credits */
+#define CREDITS_STR "Designed by George Kudrayvtsev\nMusic created by nubbinownz\nhttp://nubbinownz.newgrounds.com/audio/\n\nSpecial thanks to Google Images for artwork!"
+
 class Engine
 {
 public:
@@ -71,6 +74,8 @@ private:
 
     /* Take care of all collisions */
     bool CheckCollisions();
+    bool HandlePowerups(CEnemy* Enemy);
+    void GenerateEMP();
 
     /* Render everything on the screen */
     void Update();
@@ -107,7 +112,10 @@ private:
     TTF_Font*           Menu_Font;
     TTF_Font*           UI_Font;
 
-    /* Game variables */
+    /* Where are menu files? */
+    std::string         Menu_Files;
+
+    /* Control exiting */
     bool                quit;
 
 };

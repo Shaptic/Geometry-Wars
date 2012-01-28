@@ -1,6 +1,12 @@
 ==============================================================================
 ================================= CHANGE LOG =================================
 ==============================================================================
+    Version 1.0.3 (1.27.12)
+        - Added: Credits screen
+        - Added: Powerups, automatically added to player.
+                 Includes extra life, burst fire, bomb
+        - Fixed: Hitting an enemy only removes one life now
+
     Version 1.0.2 (1.17.12)
         - Added: High score tracking
         

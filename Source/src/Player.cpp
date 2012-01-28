@@ -35,7 +35,15 @@ void CPlayer::IncreaseAmmo(const int amount)
 
 void CPlayer::AddPowerUp(const PowerUp& powerup)
 {
-    this->PlayerPowerUps.push_back(powerup);
+    if(powerup.duration == -1)
+    {
+        if(powerup.ability == PowerUp::AMMO_PACK)
+            this->IncreaseAmmo(50);
+        else if(powerup.ability == PowerUp::EXTRA_LIFE)
+            this->lives++;
+    }
+    else
+        this->PlayerPowerUps.push_back(powerup);
 }
 
 void CPlayer::Shoot(CBullets& Bullets)
@@ -54,7 +62,7 @@ void CPlayer::Shoot(CBullets& Bullets)
             (int)this->GetX() + this->GetCollisionBoundaries()->w / 2,
             (int)this->GetY() + this->GetCollisionBoundaries()->h / 2);
 
-        Bullet->LoadEntity("Images"FN_SLASH"Player_Shot.png");
+        Bullet->LoadEntity("Images"FN_SLASH"Sprites"FN_SLASH"Player_Shot.png");
 
         Bullets.push_back(Bullet);
         this->bullets--;
@@ -84,12 +92,17 @@ bool CPlayer::CheckPowerUp(const PowerUp::ABILITY ability)
 void CPlayer::Update()
 {
     for(std::list<PowerUp>::iterator i = this->PlayerPowerUps.begin();
-        i != this->PlayerPowerUps.end(); i++)
+        i != this->PlayerPowerUps.end(); )
     {
-        if((*i).duration == 0)
-            this->PlayerPowerUps.erase(i);
+        if((*i).duration <= 0)
+        {
+            i = this->PlayerPowerUps.erase(i);
+        }
         else
+        {
             (*i).duration--;
+            i++;
+        }
     }
 
     this->shot_delay--;

@@ -46,6 +46,11 @@ int CMenu::AddMenuItem(const int x, const int y, const char* normal, const char*
     return Item->id;
 }
 
+int CMenu::AddMenuItem(const int x, const int y, const std::string& normal, const std::string& highlighted)
+{
+    return this->AddMenuItem(x, y, normal.c_str(), highlighted.c_str());
+}
+
 int CMenu::CheckMouseOver()
 {
     int mouse_x, mouse_y;

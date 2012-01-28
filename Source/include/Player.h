@@ -45,7 +45,7 @@ public:
     void IncreaseAmmo(int amount);
 
     /* Lose a life */
-    void Die(){this->lives--;}
+    void Die(){if(!this->CheckPowerUp(CPlayer::PowerUp::INVINCIBLE))this->lives--;}
 
     /* Add a powerup to the player */
     void AddPowerUp(const PowerUp& powerup);

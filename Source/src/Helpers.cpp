@@ -31,6 +31,13 @@ string toupper_ret(const string& str)
     return tmp;
 }
 
+string combine(const string& str1, const char* str2)
+{
+    stringstream ss;
+    ss << str1 << str2;
+    return ss.str();
+}
+
 vector<string> split(const string& str, char token)
 {
     string tmp(str);
