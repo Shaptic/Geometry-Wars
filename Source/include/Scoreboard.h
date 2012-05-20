@@ -16,7 +16,7 @@ struct ScoreItem
 
     int             x;          // Position on the screen
     int             y;
-    
+
     char*           main_line;  // The unchanging text such as "Lives: " or "Score: "
     int             var;        // The changing number value that complements the above string.
 
@@ -85,7 +85,7 @@ private:
     SDL_Color TextColor;
     SDL_Surface* Overlay;
     TTF_Font* MainFont;
-    
+
     std::vector<ScoreItem*> Items;
 };
 

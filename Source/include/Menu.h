@@ -26,7 +26,7 @@ public:
     int AddMenuItem(const int x, const int y, SDL_Surface* normal, SDL_Surface* highlighted);
     int AddMenuItem(const int x, const int y, const char* normal, const char* highlighted);
     int AddMenuItem(const int x, const int y, const std::string& normal, const std::string& highlighted);
-    
+
     int CheckMouseOver();
 
     int Update();

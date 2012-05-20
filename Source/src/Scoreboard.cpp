@@ -14,7 +14,7 @@ CScoreBoard::~CScoreBoard()
         SDL_FreeSurface(this->Items[i]->to_show);
 
         delete[] this->Items[i]->main_line;
-        
+
         delete this->Items[i];
     }
 
@@ -64,7 +64,7 @@ void CScoreBoard::UpdateItem(const char* primary, const int new_value)
         return;
 
     tmp->var = new_value;
-    
+
     ss << primary << new_value;
 
     SDL_FreeSurface(tmp->to_show);
@@ -83,7 +83,7 @@ void CScoreBoard::UpdateItem(const int id, const int new_value)
         return;
 
     tmp->var = new_value;
-    
+
     ss << tmp->main_line << new_value;
 
     SDL_FreeSurface(tmp->to_show);
@@ -137,7 +137,7 @@ void CScoreBoard::Update()
     static SDL_Surface* final = NULL;
 
     final = create_surface_alpha(this->Display.GetWidth(), this->Display.GetHeight());
-    
+
     for(size_t i = 0; i < this->Items.size(); i++)
     {
         SDL_SetAlpha(this->Items[i]->to_show, 0, SDL_ALPHA_TRANSPARENT);

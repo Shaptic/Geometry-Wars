@@ -13,8 +13,8 @@ public:
     CEnemy(CDisplay& m_Display, CTimer& m_Timer, const std::string& sprite_filename);
     CEnemy(CDisplay& m_Display, CTimer& m_Timer, const std::string& sprite_filename, int health);
 
-    void                Update(const CPlayer& m_Player);
-    bool                Die(const int damage);
+    void Update(const CPlayer& m_Player);
+    bool Die(const int damage);
     CPlayer::PowerUp&   GetPowerUp(){return this->powerup;}
 
 private:

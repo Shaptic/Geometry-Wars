@@ -1,5 +1,5 @@
     ShapeWars -- A clone of the popular game Geometry Wars
-        version 1.0.3, January 27th, 2012
+        version 1.0.4, May 20th, 2012
 
     Copyright (C) 2012 George Kudrayvtsev
 

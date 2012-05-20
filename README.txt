@@ -1,4 +1,4 @@
-ShapeWars v1.0.3
+ShapeWars v1.0.4
 By George Kudrayvtsev
 
 Instructions: 

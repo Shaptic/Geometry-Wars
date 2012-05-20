@@ -1,8 +1,13 @@
-/* A basic class to handle the display
- * of debugger information on the screen.
- * More or less the "console".
- * Activated by the '~' key.
- */
+/****************************************
+ *             DEBUGGER.H               *
+ *                                      *
+ * A basic class to handle the display  *
+ * of debugger information on the       *
+ * screen, acting more or less as a     *
+ * "console."                           *
+ * Use the '~' key to activate.         *
+ ***************************************/
+ 
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
 
@@ -19,14 +24,19 @@
 class CDebugger
 {
 public:
+    /* Constructor
+     * @param Display:  Basically the screen
+     * @param Settings: The settings manager for loading font names, sizes, etc.
+     */
     CDebugger(CDisplay& Display, CSettingsManager& Settings);
     ~CDebugger(){}
 
     void Update(const CPlayer& Player, CBullets& Bullets, CEnemies& Enemies);
-    
+
     /* Change debug mode to on/off */
     void ToggleDebugMode(bool toggle){this->is_debug = toggle;}
 
+    /* Are we in debug mode? */
     bool IsDebug(){return this->is_debug;}
 
 private:

@@ -16,7 +16,7 @@ CEntity(m_Display, m_Timer)
     this->shot_delay = 0;
     this->lives      = 3;
     this->NormalShot = Mix_LoadWAV("Audio"FN_SLASH"NormalWeaponFire.wav");
-    
+
     if(!this->NormalShot)
         handleError(Mix_GetError());
 

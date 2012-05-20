@@ -12,10 +12,10 @@ Engine::Engine(): Settings("Settings.ini"),
     srand((unsigned int)time(NULL));
 
     this->Timer.SetFrameRate(atoi(this->Settings.GetValueAt("FrameRate").c_str()));
-    
+
     this->Player.LoadEntity(this->Settings.GetValueAt("PlayerSprite").c_str());
     this->Player.Move_Force(this->Display.GetWidth() / 2, this->Display.GetHeight() / 2);
-    
+
     this->Player.SetMovementBoundaries_Max(
         this->Display.GetWidth()  - this->Player.GetCollisionBoundaries()->w,
         this->Display.GetHeight() - this->Player.GetCollisionBoundaries()->h);
@@ -81,7 +81,7 @@ Engine::~Engine()
     this->Garbage.EmptyTrash(this->Enemies, this->Bullets);
 
     this->HighscoreFile.open(this->Settings.GetValueAt("HighscoreFile"), std::ios::out, std::ios::trunc);
-    
+
     if(this->HighscoreFile.bad() || !this->HighscoreFile.is_open())
         handleError("Unable to record high score!", false);
 
@@ -99,11 +99,13 @@ void Engine::Menu()
     SDL_Surface* background     = LoadImage(combine(this->Menu_Files, this->Settings.GetValueAt("MenuBackground").c_str()));
     SDL_Surface* menu_overlay   = LoadImage_Alpha(combine(this->Menu_Files, "Menu_Options_Overlay.png"));
     SDL_Surface* text           = create_surface_alpha(this->Display.GetWidth(), this->Display.GetHeight());
-    
+
     /* To generate explosions */
-    CEntity* Particle = new CEntity(this->Display, this->Timer);
-    Particle->SetEntity(create_surface(1, 1, create_color(rand() % 255, rand() % 255, rand() % 255)));
-    Particle->Move_Force(rand() % this->Display.GetWidth(), rand() % this->Display.GetHeight());
+    CEntity         dot(this->Display, this->Timer);
+    SDL_Color       dot_color = {rand() % 255, rand() % 255, rand() % 255};
+    SDL_Surface*    dot_surface = create_surface(1, 1, dot_color);
+
+    dot.SetEntity(dot_surface);
 
     int play_id     = this->MainMenu.AddMenuItem(50, 75,  combine(this->Menu_Files, "Menu_PlayGame.png"),   combine(this->Menu_Files, "Menu_PlayGame_High.png"));
     int options_id  = this->MainMenu.AddMenuItem(50, 175, combine(this->Menu_Files, "Menu_Options.png"),    combine(this->Menu_Files, "Menu_Options_High.png"));
@@ -113,7 +115,7 @@ void Engine::Menu()
     SDL_Surface* tmp = render_text(this->Menu_Font, "Shape Wars", NULL, create_color(0, 190, 225), CREATE_SURFACE | TRANSPARENT_BG);
     SDL_SetAlpha(tmp, 0, SDL_ALPHA_TRANSPARENT);
     this->Display.Blit(text, tmp, 375, 100);
-    
+
     TTF_CloseFont(this->Menu_Font);
     SDL_FreeSurface(tmp);
 
@@ -133,36 +135,40 @@ void Engine::Menu()
 
     Mix_VolumeMusic(50);
 
-    int frame   = 0;
     int status  = 0;
 
     while(!this->quit)
     {
         this->Timer.Start();
-        frame++;
 
         /* Generate an explosion every 10th of a second */
-        if(frame % 10 == 0)
+        if(this->Timer.GetFrame() % (this->Timer.GetFrameRate() / 6) == 0)
         {
-            delete Particle;
-            Particle = new CEntity(this->Display, this->Timer);
-            Particle->SetEntity(create_surface(1, 1, create_color(rand() % 255, rand() % 255, rand() % 255)));
-            Particle->Move_Force(rand() % this->Display.GetWidth(), rand() % this->Display.GetHeight());
-            this->Particles.GenerateExplosion(Particle);
+            dot.FreeEntity();
+            
+            dot_color.r = rand() % 255;
+            dot_color.g = rand() % 255;
+            dot_color.b = rand() % 255;
+
+            dot_surface = create_surface(1, 1, dot_color);
+            dot.SetEntity(dot_surface);
+            dot.Move(rand() % this->Display.GetWidth(), rand() % this->Display.GetHeight(), this->Timer.GetTicks());
+
+            this->Particles.GenerateExplosion(&dot);
         }
 
         if(CheckQuit_Event())
             this->quit = true;
 
         this->Display.ClearScreen(background);
-        
+
         this->Particles.Update();
 
         this->Display.Blit(menu_overlay, 25, 25);
         this->Display.Blit(text, 0, 0);
-        
+
         status = this->MainMenu.Update();
-        
+
         if(status == play_id)
         {
             Mix_PauseMusic();
@@ -332,7 +338,7 @@ void Engine::Events()
     {
         CEnemy* Enemy = NULL;
         std::string filename(this->Levels.GetSpriteName());
-        
+
         if(filename.empty())
             Enemy = new CEnemy(this->Display, this->Timer);
         else
@@ -340,7 +346,7 @@ void Engine::Events()
 
         this->Enemies.push_back(Enemy);
     }
-    
+
     if(IsPressed(SDL_BUTTON_LEFT))
     {
         this->Player.Shoot(this->Bullets);
@@ -449,7 +455,7 @@ bool Engine::CheckCollisions()
                     this->Player.IncreaseAmmo(5);
                 }
             }
-            
+
             if(!this->Debugger.IsDebug())
             {
                 /* Reduce life supply, if we have no more, die
@@ -512,7 +518,7 @@ void Engine::Update()
         CEnemy* Enemy = NULL;
 
         std::string filename(this->Levels.GetSpriteName());
-        
+
         if(filename.empty())
             Enemy = new CEnemy(this->Display, this->Timer);
         else

@@ -63,7 +63,7 @@ public:
     void Menu();
 
 private:
-    
+
     /* Various game modes, and starting a new game */
     void SinglePlayerGame();
     //void MultiPlayerGame();
@@ -85,7 +85,7 @@ private:
     CSettingsManager    Settings;
     CTimer              Timer;
     CEvents             EventHandler;
-    
+
     CPlayer             Player;
     CEnemies            Enemies;
     CBullets            Bullets;
@@ -95,7 +95,7 @@ private:
     CLevelManager       Levels;
     CDebugger           Debugger;
     CGarbageDisposal    Garbage;
-    
+
     CMenu               MainMenu;
 
     /* Highscore data */

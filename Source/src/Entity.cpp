@@ -24,8 +24,7 @@ CEntity::~CEntity()
      * free the entity if it isn't free
      * already.
      */
-    if(this->main_entity != NULL)
-        SDL_FreeSurface(this->main_entity);
+    this->FreeEntity();
 }
 
 void CEntity::SetEntity(SDL_Surface* entity)
@@ -250,6 +249,12 @@ void CEntity::SetMovementBoundaries_Min(const int x, const int y)
     /* Set minimum movement boundaries */
     this->min_x = x;
     this->min_y = y;
+}
+
+bool CEntity::IsOffscreen()
+{
+    return (this->GetX() > this->Display.GetWidth() || this->GetX() < 0 ||
+        this->GetY() < 0 || this->GetY() > this->Display.GetHeight());
 }
 
 /* Just a bunch of get() methods to 

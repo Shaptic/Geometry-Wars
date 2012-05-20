@@ -4,6 +4,10 @@ CBullet::CBullet(CDisplay& m_Display, CTimer& m_Timer,
     const int x, const int y):
     CEntity(m_Display, m_Timer)
 {
+    /* Force the bullet to move to the given (x, y)
+     * location, which should technically be the
+     * "barrel" of whatever is shooting.
+     */
     this->Move_Force(x, y);
 
     /* Acquire target */
@@ -14,7 +18,7 @@ CBullet::CBullet(CDisplay& m_Display, CTimer& m_Timer,
      * x0 is the shot location vector (x0, y0)
      * c is the speed
      * Then:
-     *      v   = c * (x1 - x0) / |x1 - x0|
+     *      v   = c * (x1 - x0) / ||x1 - x0||
      * So:
      *      vx  = c * (dest_x - start_x) / sqrt((dest_x - start_x)^2 + (dest_y - start_y)^2)
      *      vy  = c * (dest_y - start_y) / sqrt((dest_x - start_x)^2 + (dest_y - start_y)^2)
@@ -27,6 +31,7 @@ CBullet::CBullet(CDisplay& m_Display, CTimer& m_Timer,
 
 void CBullet::Update()
 {
+    /* Update position using the unit vector */
     this->Move_Rate(this->dx, this->dy);
     this->Blit();
 }

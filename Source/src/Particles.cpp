@@ -37,7 +37,7 @@ bool CParticle::Update()
 {
     lifetime--;
 
-    if(lifetime > 0)
+    if(lifetime > 0 && !this->IsOffscreen())
     {
         this->Move_Rate(this->dx, this->dy);
         this->Blit();
@@ -47,15 +47,14 @@ bool CParticle::Update()
         return false;
 }
 
-CParticleEngine::CParticleEngine(CDisplay& Display, CTimer& Timer):
-Display(Display), Timer(Timer)
-{}
+/* ============== PARTICLE ENGINE ============== */
 
 CParticleEngine::~CParticleEngine()
 {
-    for(size_t i = 0; i < this->Particles.size(); i++)
+    for(std::list<CParticle*>::iterator i = this->Particles.begin();
+        i != this->Particles.end();)
     {
-        delete this->Particles[i];
+        delete (*i);
     }
 
     this->Particles.clear();
@@ -84,8 +83,15 @@ void CParticleEngine::GenerateExplosion(const CEntity* Entity)
 
 void CParticleEngine::Update()
 {
-    for(size_t i = 0; i < this->Particles.size(); i++)
+    for(std::list<CParticle*>::iterator i = this->Particles.begin();
+        i != this->Particles.end();)
     {
-        this->Particles[i]->Update();
+        if((*i)->Update())
+            i++;
+        else
+        {
+            delete (*i);
+            i = this->Particles.erase(i);
+        }
     }
 }

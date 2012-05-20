@@ -3,7 +3,7 @@
 CLevelManager::CLevelManager(CSettingsManager& Settings): Settings(Settings)
 {
     this->CurrentLevel = new Level;
-    
+
     /* I hate strings -___- */
     std::string tmp(Settings.ChooseValueAt("EnemySprites"));
     this->CurrentLevel->sprite_filename = new char[tmp.length() + 1];
@@ -58,16 +58,16 @@ void CLevelManager::IncreaseKillCount(int kills)
 void CLevelManager::LoadNextLevel()
 {
     static int level = 1;
-    
+
     level++;
-    
+
     /* Still hate them.. */
     std::string tmp = this->Settings.ChooseValueAt("EnemySprites");
     delete[] this->CurrentLevel->sprite_filename;
     this->CurrentLevel->sprite_filename = new char[tmp.length() + 1];
     strcpy(this->CurrentLevel->sprite_filename, tmp.c_str());
     tmp.clear();
-    
+
     if(level % 10 == 0)
     {
         //this->CurrentLevel->enemy_health *= 1.5f;
@@ -76,7 +76,7 @@ void CLevelManager::LoadNextLevel()
     {
         this->CurrentLevel->to_spawn *= 1.5f;
     }
-    
+
     this->CurrentLevel->spawn_delay *= 0.99f;
     if(this->CurrentLevel->spawn_delay == 0)
         this->CurrentLevel->spawn_delay = 1;

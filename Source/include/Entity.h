@@ -69,6 +69,9 @@ public:
     void SetMovementBoundaries_Max(const int x, const int y);
     void SetMovementBoundaries_Min(const int x, const int y);
 
+    /* Is the object on the screen? */
+    bool IsOffscreen();
+
     /* Get the coordinates of current location, current collision
      * box settings, and the current sprite.
      */

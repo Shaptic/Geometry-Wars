@@ -1,3 +1,15 @@
+/****************************************
+ *             DISPLAY.H                *
+ *                                      *
+ * An essential base class for          *
+ * simplifying all screen-related       *
+ * operations such as drawing,          *
+ * blitting, clearing the screen, etc.  *
+ * Almost every other game-related      *
+ * class will need a CDisplay& member   *
+ * in the constructor.                  *
+ ***************************************/
+ 
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
@@ -41,14 +53,15 @@
  */
 #define WINDOW_CAPTION          "Shape Wars"
 
-/* Some retarded Windows stuff messes up function names
- * with ASCII / Unicode locales.
+/* The Windows API also has a function called 
+ * LoadImage, so we ignore it completely in
+ * order for ours to work.
  */
 #ifdef WIN32
 #undef LoadImage
 #endif // WIN32
 
-/* Easily load an image file */
+/* Easily load an image file, uses the SDL_image library. */
 SDL_Surface* LoadImage(const std::string& filename);
 SDL_Surface* LoadImage(const char* filename);
 SDL_Surface* LoadImage_Alpha(const std::string& filename);
@@ -57,6 +70,9 @@ SDL_Surface* LoadImage_Alpha(const char* filename);
 class CDisplay
 {
 public:
+    /* Several layers of screen parameter
+     * customization in the constructors.
+     */
     CDisplay();
     CDisplay(const int width, const int height);
     CDisplay(const int width, const int height,
@@ -80,7 +96,9 @@ public:
     void ClearScreen();
     void ClearScreen(SDL_Surface* cleaner);
 
-    /* Self-explanatory */
+    /* Self-explanatory, returns whether or not
+     * the new screen is in fullscreen mode, or not.
+     */
     void ToggleFullscreen();
 
     /* Either put a surface on the screen, or on another

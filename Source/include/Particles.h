@@ -1,7 +1,7 @@
 #ifndef __PARTICLES_H__
 #define __PARTICLES_H__
 
-#include <vector>
+#include <list>
 
 #include "Display.h"
 #include "Timer.h"
@@ -24,7 +24,7 @@ private:
 class CParticleEngine
 {
 public:
-    CParticleEngine(CDisplay& Display, CTimer& Timer);
+    CParticleEngine(CDisplay& Display, CTimer& Timer): Display(Display), Timer(Timer){}
     ~CParticleEngine();
 
     void GenerateExplosion(const CEntity* Entity);
@@ -34,7 +34,7 @@ private:
     CDisplay& Display;
     CTimer&   Timer;
 
-    std::vector<CParticle*> Particles;
+    std::list<CParticle*> Particles;
 };
 
 #endif // __PARTICLES_H__

@@ -8,7 +8,7 @@ using std::vector;
 CSettingsManager::CSettingsManager(const string& filename)
 {
     this->settings.open(filename, std::ios::in | std::ios::out);
-    
+
     if(!this->settings.is_open() || this->settings.bad())
     {
         handleError("Unable to load Settings.ini!");

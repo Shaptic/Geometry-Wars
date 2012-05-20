@@ -41,7 +41,7 @@ CEntity(m_Display, m_Timer), ENEMY_SPEED(2.5f)
 
     /* Set health */
     this->health = health;
-    
+
     this->Init();
 }
 
@@ -59,7 +59,7 @@ bool CEnemy::Die(const int m_damage)
     /* Update the health bar to show accurate health */
     int health = this->health / 4;  // The bar is 1/4th of the size of actual health
     int damage = (100 - this->health) / 4;
-    
+
     SDL_FreeSurface(this->health_bar);
     this->health_bar = create_surface(25, 5);
 

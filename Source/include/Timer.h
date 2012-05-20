@@ -11,6 +11,7 @@ public:
 
     void Start();
     float GetTicks();
+    int GetFrame();
     void SetFrameRate(const unsigned int newFrameRate){ this->FRAME_RATE = newFrameRate; }
     int  GetFrameRate(){ return this->FRAME_RATE; }
     void DelayFPS();
@@ -18,6 +19,7 @@ public:
 private:
     unsigned int FRAME_RATE;
     int ticks;
+    double frame;
 };
 
 #endif // TIMER_H

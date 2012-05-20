@@ -187,41 +187,28 @@ void CDisplay::Initialize()
 
 void CDisplay::RenewDisplay()
 {
-    /* We create a new display with new parameters.
-     * We do not need to call SDL_FreeSurface() on 
-     * the main display because SDL_SetVideoMode()
-     * will do that for us.
-     */
-    this->width     = DEFAULT_SCREEN_WIDTH;
-    this->height    = DEFAULT_SCREEN_HEIGHT;
-    this->bpp       = DEFAULT_SCREEN_BPP;
-    this->flags     = DEFAULT_SCREEN_FLAGS;
-
-    this->screen = SDL_SetVideoMode(DEFAULT_SCREEN_WIDTH,
-            DEFAULT_SCREEN_HEIGHT, DEFAULT_SCREEN_BPP,
-            DEFAULT_SCREEN_FLAGS);
-
-    if(!this->screen)
-        handleError(SDL_GetError());
+    this->RenewDisplay(DEFAULT_SCREEN_WIDTH,
+        DEFAULT_SCREEN_HEIGHT,
+        DEFAULT_SCREEN_BPP,
+        DEFAULT_SCREEN_FLAGS);
 }
 
 void CDisplay::RenewDisplay(const int width, const int height)
 {
-    /* Simply RenewDisplay() with custom parameters. */
-    this->width     = width;
-    this->height    = height;
-
-    this->screen = SDL_SetVideoMode(width, height,
-            DEFAULT_SCREEN_BPP, DEFAULT_SCREEN_FLAGS);
-
-    if(!this->screen)
-        handleError(SDL_GetError());
+    this->RenewDisplay(width,
+        height,
+        DEFAULT_SCREEN_BPP,
+        DEFAULT_SCREEN_FLAGS);
 }
 
 void CDisplay::RenewDisplay(const int width, const int height,
             const int bpp, const int flags)
 {
-    /* Simply RenewDisplay() with more custom parameters. */
+    /* We create a new display with new parameters.
+     * We do not need to call SDL_FreeSurface() on 
+     * the main display because SDL_SetVideoMode()
+     * will do that for us.
+     */
     this->width     = width;
     this->height    = height;
     this->bpp       = bpp;
