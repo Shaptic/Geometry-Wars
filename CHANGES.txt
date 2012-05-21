@@ -1,8 +1,13 @@
 ==============================================================================
 ================================= CHANGE LOG =================================
 ==============================================================================
+    Version 1.0.6 (5.20.12)
+        - Fixed: Program crash upon exiting
+        - Changed: Replaced CGarbageDisposal with proper usage of std::list::erase()
+        - Changed: Disabled power-ups because they are not properly implemented yet
+
     Version 1.0.4 (5.20.12)
-        - Fixed: Memory leak on main menu in the ParticleEngine class
+        - Fixed: Memory leak on main menu in the CParticleEngine class
 
     Version 1.0.3 (1.27.12)
         - Added: Credits screen
@@ -39,6 +44,7 @@
         - Changed: Menu style
         - Changed: Replaced iterators with object pointers
         - Changed: README style
+        - Played: Skyrim
     
     Version 0.4.1 (11.11.11)
         - Fixed: Game restarts

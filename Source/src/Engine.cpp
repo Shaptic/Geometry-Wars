@@ -75,11 +75,18 @@ Engine::Engine(): Settings("Settings.ini"),
 
 Engine::~Engine()
 {
-    this->Garbage.EmptyTrash(this->Enemies, this->Bullets);
-    this->Garbage.TrashBullets(this->Bullets);
-    this->Garbage.TrashEnemies(this->Enemies);
-    this->Garbage.EmptyTrash(this->Enemies, this->Bullets);
+    for(CEnemies::iterator i = this->Enemies.begin(); i != this->Enemies.end();)
+    {
+        delete (*i);
+        i = this->Enemies.erase(i);
+    }
 
+    for(CBullets::iterator i = this->Bullets.begin(); i != this->Bullets.end();)
+    {
+        delete (*i);
+        i = this->Bullets.erase(i);
+    }
+    
     this->HighscoreFile.open(this->Settings.GetValueAt("HighscoreFile"), std::ios::out, std::ios::trunc);
 
     if(this->HighscoreFile.bad() || !this->HighscoreFile.is_open())
@@ -88,7 +95,6 @@ Engine::~Engine()
     int hash = 10 + rand() % 10;
     this->HighscoreFile << this->high_score * hash << hash << "\n";
 
-    this->HighscoreFile.flush();
     this->HighscoreFile.close();
 }
 
@@ -225,25 +231,15 @@ void Engine::SinglePlayerGame()
          * moving offscreen if the window is moved.
          * TODO: Find cause.
          */
-        if( this->Player.GetX() > this->Display.GetWidth() || 
-            this->Player.GetY() > this->Display.GetHeight() ||
-            this->Player.GetX() < 0 ||
-            this->Player.GetY() < 0)
+        if(this->Player.IsOffscreen())
         {
             this->Player.Move_Force(
                 this->Display.GetWidth() / 2,
                 this->Display.GetHeight() / 2);
         }
 
-        /* We empty the trash twice, once after
-         * detecting collisions, and again after testing
-         * for off-screen bullets. This is because, in rare
-         * cases, a bullet will collide with an enemy offscreen,
-         * causing it to be deleted twice.
-         */
         if(this->CheckCollisions())
             break;
-        this->Garbage.EmptyTrash(this->Enemies, this->Bullets);
 
         /* Update everything on-screen */
         this->Update();
@@ -292,10 +288,17 @@ void Engine::SinglePlayerGame()
 
 void Engine::Reset()
 {
-    this->Garbage.EmptyTrash(this->Enemies, this->Bullets);
-    this->Garbage.TrashBullets(this->Bullets);
-    this->Garbage.TrashEnemies(this->Enemies);
-    this->Garbage.EmptyTrash(this->Enemies, this->Bullets);
+    for(CEnemies::iterator i = this->Enemies.begin(); i != this->Enemies.end();)
+    {
+        delete (*i);
+        i = this->Enemies.erase(i);
+    }
+
+    for(CBullets::iterator i = this->Bullets.begin(); i != this->Bullets.end();)
+    {
+        delete (*i);
+        i = this->Bullets.erase(i);
+    }
 
     this->Bullets.clear();
     this->Enemies.clear();
@@ -381,79 +384,78 @@ void Engine::GenerateEMP()
         this->Score.UpdateItem_Increment("Score: ", 5 * this->Enemies.size());
 
     for(CEnemies::iterator i = this->Enemies.begin();
-        i != this->Enemies.end(); i++)
+        i != this->Enemies.end();)
     {
         this->Particles.GenerateExplosion(*i);
-    }
-
-    this->Garbage.TrashEnemies(this->Enemies);
-    this->Garbage.EmptyTrash(this->Enemies, this->Bullets);
+        delete (*i);
+        i = this->Enemies.erase(i);
+    }    
 }
 
 bool Engine::CheckCollisions()
 {
-    /* For every enemy that is alive, check
-     * to see if any bullets have hit it.
-     *
-     * Because std::list is stupid, you must
-     * break out of the loop everytime you
-     * want to delete something, meaning sometimes
-     * bullet and enemy collisions won't register
-     * at the right time, especially if there is an
-     * extremely large amount of them.
-     * TODO: Maybe solve this?
-     */
-    for(CEnemies::iterator i = this->Enemies.begin();
-        i != this->Enemies.end(); i++)
+    bool incr = false;
+
+    for(CEnemies::iterator i = this->Enemies.begin(); 
+        i != this->Enemies.end(); /* no third */)
     {
-        /* Check if any of the bullets have collided with any
-         * of the enemies. If they have, and the enemy is dead,
-         * set up power-ups accordingly. If not dead, just add
-         * the damage.
+        /* Check if any of the bullets have hit any of the
+         * enemies, which results in an explosion and
+         * an increase in the score.
          */
         for(CBullets::iterator j = this->Bullets.begin();
-            j != this->Bullets.end(); j++)
+            j != this->Bullets.end(); /* no third */)
         {
-            if((*j)->DetectCollision(*i))
+            if((*j)->DetectCollision(*i))   // Bullet has collided with enemy
             {
-                if((*i)->Die(this->Player.GetDamage()))
+                if((*i)->Die(this->Player.GetDamage())) // Enough damage dealt that enemy /should/ die
                 {
-                    if(this->HandlePowerups(*i))    // Power-up isn't an EMP so we destroy
-                                                    // the single enemy
+                    this->Particles.GenerateExplosion(*i);
+
+                    if(!this->Debugger.IsDebug())
                     {
-                        if(!this->Debugger.IsDebug())
+                        this->Score.UpdateItem_Increment("Score: ", 5);
+                        if(this->Score.GetItemValue("Score: ") > this->high_score)
                         {
-                            this->Score.UpdateItem_Increment("Score: ", 5);
-                            if(this->Score.GetItemValue("Score: ") >= this->high_score)
-                            {
-                                this->high_score = this->Score.GetItemValue("Score: ");
-                                this->Score.UpdateItem("Highscore: ", this->high_score);
-                            }
+                            this->high_score = this->Score.GetItemValue("Score: ");
+                            this->Score.UpdateItem("Highscore: ", this->high_score);
                         }
-
-                        this->Levels.IncreaseKillCount(1);
-                        this->Player.IncreaseAmmo(5);
                     }
-                }
 
-                this->Garbage.TrashBullet(*j);
-                return false;
-            }
-        }
-        /* If the player has run into the enemy, lose
-         * a life, check powerups, destroy the enemy,
-         * explode, and if no lives are left, end the game.
-         */
-        if(this->Player.DetectCollision(*i))
-        {
-            if((*i)->Die(this->Player.GetDamage() * 1000))  // Damage is 1000 so there's no issue with
-                                                            // the enemy not dying
-            {
-                if(this->HandlePowerups(*i))
-                {
                     this->Levels.IncreaseKillCount(1);
                     this->Player.IncreaseAmmo(5);
+
+                    delete (*i);
+                    delete (*j);
+                    i = this->Enemies.erase(i);
+                    j = this->Bullets.erase(j);
+
+                    /* We incremented the CEnemies::iterator, so we must
+                     * let the next part of the program know that they
+                     * should NOT increment it again.
+                     */
+                    incr = true;
                 }
+            }
+            else    // Bullet didn't hit anything, increment
+            {
+                j++;
+            }
+        }
+
+        /* Check if enemy has collided with player, 
+         * which results in death, or loss of "lives."
+         */
+        if(this->Player.DetectCollision(*i))    // Player touched enemy
+        {
+            if((*i)->Die(this->Player.GetDamage() * 1000))  // Times 1000 to ensure death on touch
+            {
+                this->Levels.IncreaseKillCount(1);
+                this->Player.IncreaseAmmo(5);
+
+                this->Particles.GenerateExplosion(*i);
+
+                i = this->Enemies.erase(i);
             }
 
             if(!this->Debugger.IsDebug())
@@ -476,9 +478,13 @@ bool Engine::CheckCollisions()
                     this->Score.UpdateItem("Highscore: ", this->high_score);
                 }
             }
-
-            return false;
         }
+        else if(!incr)      // Enemy is completely unharmed && we haven't incremented
+        {                   // in the CBullets for() loop
+            i++;
+        }
+        else
+            incr = false;
     }
 
     return false;
@@ -497,12 +503,10 @@ bool Engine::HandlePowerups(CEnemy* Enemy)
     {
         this->Player.AddPowerUp(Enemy->GetPowerUp());
         this->Particles.GenerateExplosion(Enemy);
-        this->Garbage.TrashEnemy(Enemy);
     }
     else
     {
         this->Particles.GenerateExplosion(Enemy);
-        this->Garbage.TrashEnemy(Enemy);
     }
 
     return true;
@@ -535,16 +539,16 @@ void Engine::Update()
 
     /* Check for off-screen bullets */
     for(CBullets::iterator j = this->Bullets.begin();
-        j != this->Bullets.end(); j++)
+        j != this->Bullets.end();)
     {
-        if((*j)->GetX() > this->Display.GetWidth() || ((*j)->GetX() < 0))
-            this->Garbage.TrashBullet(*j);
-
-        else if((*j)->GetY() > this->Display.GetHeight() || ((*j)->GetY() < 0))
-            this->Garbage.TrashBullet(*j);
-
+        if((*j)->IsOffscreen())
+            j = this->Bullets.erase(j);
         else
+        {
             (*j)->Update();
+            (*j)->Blit();
+            j++;
+        }
     }
 
     /* Update all enemies */
@@ -556,7 +560,4 @@ void Engine::Update()
 
     /* Show debug info if necessary */
     this->Debugger.Update(this->Player, this->Bullets, this->Enemies);
-
-    /* Empty the trash again */
-    this->Garbage.EmptyTrash(this->Enemies, this->Bullets);
 }

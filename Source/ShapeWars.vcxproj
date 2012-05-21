@@ -94,7 +94,6 @@
     <ClInclude Include="include\Entity.h" />
     <ClInclude Include="include\Errors.h" />
     <ClInclude Include="include\Events.h" />
-    <ClInclude Include="include\GarbageDisposal.h" />
     <ClInclude Include="include\Helpers.h" />
     <ClInclude Include="include\LevelManager.h" />
     <ClInclude Include="include\Menu.h" />
@@ -115,7 +114,6 @@
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Errors.cpp" />
     <ClCompile Include="src\Events.cpp" />
-    <ClCompile Include="src\GarbageDisposal.cpp" />
     <ClCompile Include="src\Helpers.cpp" />
     <ClCompile Include="src\LevelManager.cpp" />
     <ClCompile Include="src\Main.cpp" />

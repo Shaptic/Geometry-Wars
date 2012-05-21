@@ -55,9 +55,8 @@ CParticleEngine::~CParticleEngine()
         i != this->Particles.end();)
     {
         delete (*i);
+        i = this->Particles.erase(i);
     }
-
-    this->Particles.clear();
 }
 
 void CParticleEngine::GenerateExplosion(const CEntity* Entity)

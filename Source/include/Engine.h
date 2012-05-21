@@ -45,9 +45,6 @@
 /* Console debugging interface */
 #include "Debugger.h"
 
-/* Maintaining cleanliness */
-#include "GarbageDisposal.h"
-
 /* Controlling the Settings.ini file */
 #include "Settings.h"
 
@@ -94,7 +91,6 @@ private:
     CParticleEngine     Particles;
     CLevelManager       Levels;
     CDebugger           Debugger;
-    CGarbageDisposal    Garbage;
 
     CMenu               MainMenu;
 
