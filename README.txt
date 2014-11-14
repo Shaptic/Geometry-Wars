@@ -1,5 +1,4 @@
 ShapeWars v1.0.4
-By George Kudrayvtsev
 
 Instructions: 
     Score as many points as possible by avoiding and
